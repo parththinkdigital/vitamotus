@@ -1,0 +1,11 @@
+Model Information:
+* title:	Spider (Widow) - Rigged + Animated + IK bones
+* source:	https://sketchfab.com/3d-models/spider-widow-rigged-animated-ik-bones-cf9ac4b7f65e4f7aa72b46a0249da489
+* author:	vagnerpetrocellli (https://sketchfab.com/vagnerpetrocellli)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Spider (Widow) - Rigged + Animated + IK bones" (https://sketchfab.com/3d-models/spider-widow-rigged-animated-ik-bones-cf9ac4b7f65e4f7aa72b46a0249da489) by vagnerpetrocellli (https://sketchfab.com/vagnerpetrocellli) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
