@@ -1,82 +1,117 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { taxonomyApi, getImageUrl } from "@/lib/api";
+import Link from "next/link";
 
 const TAXONOMY_PATH = ["Arthropoda", "Arachnida", "Araneae", "Theraphosidae", "Poecilotheria", "P. metallica"];
 
 export default function SpeciesOfTheDay({ isHorizontal = false }) {
-  const species = {
-    scientificName: "Poecilotheria metallica",
-    commonName: "Gooty sapphire ornamental tarantula",
-    family: "Theraphosidae",
-    habitat: "Tropical dry deciduous forests",
-    distribution: "Endemic to India (Andhra Pradesh, Telangana, Karnataka)",
-    note: "A striking arboreal tarantula known for its metallic blue coloration and intricate patterns. Often found on tree trunks.",
-    imageUrl: "https://images.unsplash.com/photo-1548681528-6a5c45b66b42?q=80&w=2000&auto=format&fit=crop"
-  };
+  const [species, setSpecies] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadFeatured() {
+      try {
+        const data = await taxonomyApi.getSpeciesOfTheDay();
+        setSpecies(data);
+      } catch (err) {
+        console.error("Failed to load spotlight specimen:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadFeatured();
+  }, []);
+
+  if (loading || !species) return (
+    <div className={`h-[500px] w-full bg-parchment/50 animate-pulse rounded-[3rem] border border-ink/5 flex items-center justify-center`}>
+      <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-ink/20">Syncing with Archive...</span>
+    </div>
+  );
 
   return (
     <motion.div 
-      initial={{ opacity: 0, x: 50 }}
-      whileInView={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="bg-white/60 backdrop-blur-md rounded-[2.5rem] overflow-hidden shadow-2xl border border-ink/5 flex flex-col jointed-border"
+      className={`bg-parchment/80 backdrop-blur-2xl rounded-[3rem] overflow-hidden shadow-2xl border border-ink/5 flex ${isHorizontal ? 'flex-col lg:flex-row' : 'flex-col'} group`}
     >
-      <div className="flex flex-col">
-        {/* Image Area */}
-        <div className="relative h-[300px] overflow-hidden group">
-          <div className="absolute top-6 left-6 z-20 bg-amber text-parchment text-[11px] font-bold uppercase tracking-widest px-4 py-2 rounded-xl flex items-center gap-3 shadow-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            Entry of the Day
-          </div>
-          <img 
-            src={species.imageUrl} 
-            alt={species.scientificName}
-            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent" />
+      {/* ─── IMAGE AREA ─── */}
+      <div className={`relative overflow-hidden ${isHorizontal ? 'w-full lg:w-1/2 min-h-[500px]' : 'h-[400px]'} bg-ink`}>
+        <div className="absolute top-8 left-8 z-20 bg-moss text-parchment text-[10px] font-bold uppercase tracking-[0.4em] px-6 py-3 rounded-full flex items-center gap-3 shadow-2xl">
+          <div className="w-1.5 h-1.5 rounded-full bg-parchment animate-pulse" />
+          Field Spotlight
         </div>
+        
+        <img 
+          src={getImageUrl(species)}
+          alt={species.scientific_name}
+          className="w-full h-full object-cover opacity-80 transition-transform duration-[2000ms] group-hover:scale-110 grayscale-[0.2] group-hover:grayscale-0"
+        />
+        
+        <motion.div 
+          animate={{ x: ["-100%", "100%"] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          className="absolute top-0 bottom-0 w-[2px] bg-gradient-to-r from-transparent via-moss/40 to-transparent z-10"
+        />
 
-        {/* Data Area */}
-        <div className="p-10 flex flex-col gap-10">
-          <div className="space-y-3">
-            <h3 className="text-4xl lg:text-5xl font-serif italic text-ink leading-tight tracking-tight">{species.scientificName}</h3>
-            <p className="text-base font-bold text-moss tracking-wide uppercase text-[12px]">{species.commonName}</p>
+        <div className="absolute bottom-8 left-8 z-20 flex flex-col gap-1 text-left">
+           <span className="text-[9px] font-mono text-parchment/60 uppercase tracking-[0.2em]">Lens: 2.4x Zoom</span>
+           <span className="text-[9px] font-mono text-parchment/60 uppercase tracking-[0.2em]">Exposure: -1.2 EV</span>
+        </div>
+      </div>
+
+      {/* ─── DATA AREA ─── */}
+      <div className={`p-12 lg:p-16 flex flex-col justify-between ${isHorizontal ? 'w-full lg:w-1/2' : 'w-full'}`}>
+        <div className="space-y-10 text-left">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+               <span className="text-[10px] font-mono font-bold text-moss tracking-[0.2em] uppercase">Archive Log_{species.wsc_species_id}</span>
+               <div className="h-[1px] w-12 bg-moss/20" />
+            </div>
+            <h3 className="text-5xl lg:text-7xl font-serif italic text-ink leading-none tracking-tighter">
+              {species.scientific_name}
+            </h3>
+            <p className="text-sm font-bold text-ink/40 tracking-[0.3em] uppercase">{species.common_name || 'Accepted Scientific Species'}</p>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
             {[
-              { label: "Family", value: species.family },
+              { label: "Family", value: species.family.name },
               { label: "Distribution", value: species.distribution },
-              { label: "Habitat", value: species.habitat },
-              { label: "Scientific Note", value: species.note, italic: true }
+              { label: "Status", value: species.taxon_status },
             ].map((item) => (
-              <div key={item.label} className="flex flex-col gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-ink/30">{item.label}</span>
-                <span className={`text-ink/80 font-medium leading-relaxed ${item.italic ? 'italic text-ink/60 text-xs' : 'text-sm'}`}>
-                  {item.value}
-                </span>
+              <div key={item.label} className="space-y-2 border-l border-moss/10 pl-6">
+                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-ink/20">{item.label}</span>
+                <p className="text-sm text-ink/80 font-medium leading-relaxed">{item.value}</p>
               </div>
             ))}
           </div>
 
-          <button className="w-full py-5 border-2 border-ink/5 rounded-2xl text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-ink hover:text-parchment hover:border-ink transition-all flex items-center justify-center gap-3 cursor-pointer group">
-            View full profile 
-            <span className="text-lg group-hover:translate-x-2 transition-transform">→</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Taxonomy Breadcrumb Footer */}
-      <div className="bg-moss/[0.05] border-t border-ink/5 px-8 py-5 flex flex-wrap gap-3">
-        {TAXONOMY_PATH.map((item, i) => (
-          <div key={item} className="flex items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg bg-white/80 border border-ink/5 text-ink/50">
-              {item}
-            </span>
-            {i < TAXONOMY_PATH.length - 1 && <span className="text-ink/20 text-xs">/</span>}
+          <div className="space-y-3 pt-6 border-t border-ink/5">
+             <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-ink/20 block">Archivist's Note</span>
+             <p className="text-lg font-serif italic text-ink/60 leading-relaxed max-w-lg">
+               "{species.vitamotus_notes || "A distinctive member of the " + species.family.name + " family, cataloged by " + species.authority + " in " + species.year + "."}"
+             </p>
           </div>
-        ))}
+        </div>
+
+        <div className="mt-12 flex flex-col sm:flex-row gap-6">
+          <Link 
+            href={`/species/${species.scientific_name.replace(/ /g, '-')}`}
+            className="flex-1 py-6 bg-ink text-parchment rounded-2xl text-[10px] font-bold text-center uppercase tracking-[0.4em] hover:bg-moss transition-all duration-500 shadow-xl group"
+          >
+            Launch Full Analysis <span className="ml-4 inline-block transition-transform group-hover:translate-x-2">→</span>
+          </Link>
+          <div className="flex items-center gap-4 px-6 border border-ink/5 rounded-2xl">
+             <div className="flex -space-x-2">
+                {[1,2,3].map(i => <div key={i} className="w-8 h-8 rounded-full border-2 border-parchment bg-moss/20" />)}
+             </div>
+             <span className="text-[9px] font-bold text-ink/30 uppercase tracking-widest">12 Verified Scans</span>
+          </div>
+        </div>
       </div>
     </motion.div>
   );

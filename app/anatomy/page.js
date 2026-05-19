@@ -34,7 +34,7 @@ const ANATOMY_STEPS = [
   {
     id: "cephalothorax",
     title: "The Cephalothorax",
-    desc: "The front segment contains the brain, stomach, and poison glands. It's the command center where all limbs are attached.",
+    desc: "The front segment (prosoma) contains the brain, stomach, and venom glands. It is the structural anchor where all eight limbs are attached.",
     camera: [0.82, 1.11, 3.06],
     target: [-1.03, 0.76, -0.15],
     customPos: { bottom: 350, left: 48 },
@@ -42,7 +42,7 @@ const ANATOMY_STEPS = [
   {
     id: "eyes",
     title: "Sensory Array",
-    desc: "Most spiders have eight eyes, though their arrangement varies by family. They can detect movement, light polarity, and in some species, form high-resolution images.",
+    desc: "Most spiders possess eight eyes, arranged specifically by family. They detect motion, light polarity, and in some species, high-resolution imagery.",
     camera: [-0.54, 1.32, 1.42],
     target: [0.72, 0.61, 0.13],
     customPos: { bottom: 29, left: 800 },
@@ -50,7 +50,7 @@ const ANATOMY_STEPS = [
   {
     id: "legs",
     title: "Hydraulic Limbs",
-    desc: "Unlike mammals, spiders use hydraulic pressure to extend their legs. This allows for incredible strength and agility relative to their size.",
+    desc: "Unlike mammals, spiders use hydraulic fluid pressure (hemolymph) to extend their legs, allowing for explosive strength and agility.",
     camera: [-4.28, 1.45, 3.74],
     target: [1.02, 0.47, 0.59],
     customPos: { bottom: 350, left: 1100 },
@@ -58,7 +58,7 @@ const ANATOMY_STEPS = [
   {
     id: "abdomen",
     title: "The Abdomen",
-    desc: "The rear segment houses the heart, respiratory organs, and the remarkable silk-producing glands called spinnerets.",
+    desc: "The rear segment (opisthosoma) houses the heart, respiratory organs (book lungs), and the reproductive system.",
     camera: [-0.94, 3.7, -3.4],
     target: [2, -1.5, -0.2],
     customPos: { bottom: 350, left: 48 },
@@ -66,7 +66,7 @@ const ANATOMY_STEPS = [
   {
     id: "conclusion",
     title: "Perfectly Adapted",
-    desc: "From the silk they spin to the venom they yield, every part of the spider is tuned for survival in its specific niche.",
+    desc: "From the silk they spin to the hydraulic limbs they move with, every part of the spider is tuned for survival in its specific niche.",
     camera: [-0.04, 2.66, 4.31],
     target: [-0.88, 0.58, -0.29],
     customPos: { bottom: 350, left: 48 },

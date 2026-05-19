@@ -1,0 +1,20 @@
+VitaMotus.earth Spider Species Master Database,,,,,,,,
+Purpose,A website-ready master taxonomy backbone where one row represents one accepted spider species/subspecies taxon entry.,,,,,,,
+Hierarchy generated,Family → Genus → Scientific name,,,,,,,
+Rows in master sheet,53857,,,,,,,
+Accepted species rows without subspecies,53452,,,,Scientific name,,,What is VitaMotus?
+Accepted subspecies rows included,405,,,,Common name,,,Start with spiders
+Families,138,,,,Family,,,Browse Families
+Family-genus combinations,4508,,,,Genus,,,Browse Genera
+Taxon status included,VALID only. Synonyms and replaced homonyms from the raw WSC export were excluded from this public-facing master sheet.,,,,Authority / described by,,,Browse Species
+Raw export status counts,"VALID: 53857, SYNONYM: 10409, HOMONYM_REPLACED: 312",,,,Year described,,,Species of the Day
+Recommended use,Import this master sheet into the website backend. Use Family and Genus to create navigation pages; use Scientific Name to create species pages.,,,,Distribution,,,Learn Spider Anatomy
+Current profile status,taxonomy_only,,,,Habitat,,,Learn Spider Taxonomy
+Source,World Spider Catalog species export,,,,Size,,,
+Source page,https://wsc.nmbe.ch/dataresources,,,,Behaviour,,,
+Source CSV,https://wsc.nmbe.ch/resources/species_export_20260505.csv,,,,Venom note,,,
+Source version date,2026-05-05,,,,Conservation status,,,
+License note,The WSC data resources page states the species export is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.,,,,Interesting fact,,,
+Attribution suggestion,"Taxonomic backbone based on World Spider Catalog species export, Natural History Museum Bern, accessed/imported 2026-05-05.",,,,Photo credits / source,,,
+Important website note,Display a source/attribution note and a 'last imported' date on VitaMotus.earth. Keep the site non-commercial unless permissions/licensing are clarified.,,,,References,,,
+Next phase columns to add,"common_name, habitat, behaviour, size, venom_medical_relevance, conservation_status, image_credit, references, profile_written_by, profile_review_status",,,,,,,

@@ -59,7 +59,7 @@ export default function FeatureGrid({ isFourColumn = false }) {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.1, duration: 1, ease: [0.22, 1, 0.36, 1] }}
           viewport={{ once: true }}
-          className="group relative bg-white/40 backdrop-blur-2xl border border-white rounded-[2.5rem] overflow-hidden shadow-[0_32px_64px_-12px_rgba(0,0,0,0.06)] hover:shadow-2xl transition-all duration-700 flex flex-col cursor-pointer"
+          className="group relative bg-parchment/40 backdrop-blur-2xl border border-white/20 rounded-[2.5rem] overflow-hidden shadow-[0_32px_64px_-12px_rgba(0,0,0,0.06)] hover:shadow-2xl transition-all duration-700 flex flex-col cursor-pointer"
         >
           {/* Decorative Technical Motif */}
           <div className="absolute top-8 right-8 flex flex-col items-end opacity-20 group-hover:opacity-50 transition-opacity">
@@ -69,7 +69,7 @@ export default function FeatureGrid({ isFourColumn = false }) {
 
           {/* Header */}
           <div className="p-10 pb-6 flex flex-col gap-6">
-             <div className="w-14 h-14 rounded-2xl bg-parchment/80 border border-ink/5 flex items-center justify-center text-ink group-hover:bg-moss group-hover:text-parchment transition-all duration-700 shadow-sm">
+             <div className="w-14 h-14 rounded-2xl bg-fern/80 border border-ink/5 flex items-center justify-center text-ink group-hover:bg-moss group-hover:text-parchment transition-all duration-700 shadow-sm">
                 {feature.icon}
              </div>
              <h3 className="text-3xl font-serif text-ink tracking-tight leading-none italic">{feature.title}</h3>

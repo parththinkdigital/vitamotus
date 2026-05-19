@@ -24,7 +24,7 @@ export default function SearchSection() {
         <input 
           type="text" 
           placeholder="Search species, genera, families..."
-          className="w-full bg-white/40 backdrop-blur-xl border border-white rounded-[1.25rem] py-7 pl-16 pr-8 text-lg text-ink placeholder:text-ink/20 focus:outline-none focus:border-moss/30 focus:ring-[12px] focus:ring-moss/5 transition-all duration-700 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.03)] group-hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.05)]"
+          className="w-full bg-parchment/40 backdrop-blur-xl border border-white/20 rounded-[1.25rem] py-7 pl-16 pr-8 text-lg text-ink placeholder:text-ink/20 focus:outline-none focus:border-moss/30 focus:ring-[12px] focus:ring-moss/5 transition-all duration-700 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.03)] group-hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.05)]"
         />
         <div className="absolute right-4 inset-y-4 flex items-center">
             <div className="h-full w-[1px] bg-ink/5 mr-4" />
@@ -46,7 +46,7 @@ export default function SearchSection() {
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.04, duration: 0.6 }}
               viewport={{ once: true }}
-              className="px-5 py-2.5 bg-white/40 backdrop-blur-md border border-white/50 rounded-xl text-[9px] font-bold uppercase tracking-[0.2em] text-ink/60 hover:border-moss/40 hover:text-moss hover:bg-white hover:shadow-lg hover:shadow-moss/5 transition-all duration-500 cursor-pointer"
+              className="px-5 py-2.5 bg-fern/40 backdrop-blur-md border border-white/10 rounded-xl text-[9px] font-bold uppercase tracking-[0.2em] text-ink/60 hover:border-moss/40 hover:text-moss hover:bg-white hover:shadow-lg hover:shadow-moss/5 transition-all duration-500 cursor-pointer"
             >
               {chip}
             </motion.button>
