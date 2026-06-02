@@ -30,7 +30,7 @@ const ANATOMY_STEPS = [
     desc: "Spiders are arachnids, characterized by an exoskeleton, a segmented body, and eight jointed legs. Their anatomy is a masterclass in biological engineering.",
     camera: [-0.39, 1.57, 4.12],
     target: [-1.09, 0.72, -0.13],
-    customPos: { bottom: 5.33, left: 3.33 },
+    customPos: { bottom: 14, left: 4 },
   },
   {
     id: "cephalothorax",
@@ -38,7 +38,7 @@ const ANATOMY_STEPS = [
     desc: "The front segment (prosoma) contains the brain, stomach, and venom glands. It is the structural anchor where all eight limbs are attached.",
     camera: [0.82, 1.11, 3.06],
     target: [-1.03, 0.76, -0.15],
-    customPos: { bottom: 38.89, left: 3.33 },
+    customPos: { bottom: 53, left: 4 },
   },
   {
     id: "eyes",
@@ -46,19 +46,19 @@ const ANATOMY_STEPS = [
     desc: "Most spiders possess eight eyes, arranged specifically by family. They detect motion, light polarity, and in some species, high-resolution imagery.",
     camera: [-0.54, 1.32, 1.42],
     target: [0.72, 0.61, 0.13],
-    customPos: { bottom: 3.22, left: 55.56 },
+    customPos: { bottom: 12, left: 50 },
   },
   {
     id: "chelicerae",
     title: "Chelicerae",
     desc: "The chelicerae are the spider's mouthparts, each tipped with a sharp fang connected to a venom gland. They pierce prey and inject venom that liquefies tissue, enabling external digestion.",
-    camera: [-0.55, 0.7, 1.7], target: [0.01, 0.42, -0.08], customPos: { bottom: 5.33, left: 3.33 },
+    camera: [-0.55, 0.7, 1.7], target: [0.01, 0.42, -0.08], customPos: { bottom: 14, left: 4 },
   },
   {
     id: "pedipalps",
     title: "Pedipalps",
     desc: "Pedipalps are the second pair of appendages, functioning as sensory organs for touch and taste. In males, the tips are modified into bulbus copulatory organs used for sperm transfer during mating.",
-    camera: [0.65, 0.64, 0.92], target: [-0.07, 0.33, 0.07], customPos: { bottom: 5.33, left: 3.33 }
+    camera: [0.65, 0.64, 0.92], target: [-0.07, 0.33, 0.07], customPos: { bottom: 14, left: 4 }
   },
   {
     id: "legs",
@@ -72,13 +72,13 @@ const ANATOMY_STEPS = [
     id: "booklungs",
     title: "Book Lungs",
     desc: "Book lungs are the spider's primary respiratory organs, located on the underside of the abdomen. They consist of stacked leaf-like plates (lamellae) that maximize surface area for gas exchange — a design that predates the evolution of insect tracheae by millions of years. Some species also possess a tracheal system for supplementary oxygen intake.",
-    camera: [-0.95, -0.89, -0.41], target: [-0.71, -0.22, -0.74], customPos: { bottom: 8, left: 10 }
+    camera: [-0.95, -0.89, -0.41], target: [-0.71, -0.22, -0.74], customPos: { bottom: 14, left: 10 }
   },
   {
     id: "spinnerets",
     title: "Spinnerets",
     desc: "Spinnerets are movable, finger-like appendages at the rear of the abdomen that extrude liquid silk protein (fibroin) from multiple silk glands. The silk hardens instantly upon exposure to air. Spiders can produce up to seven different silk types, each with distinct properties — from dragline silk stronger than steel to sticky capture silk that remains elastic at extreme temperatures.",
-    camera: [-1.27, -0.94, -2.31], target: [-0.52, -0.12, -2.23], customPos: { bottom: 5.33, left: 3.33 }
+    camera: [-1.27, -0.94, -2.31], target: [-0.52, -0.12, -2.23], customPos: { bottom: 40, left: 3.33 }
   },
   {
     id: "abdomen",
@@ -86,7 +86,7 @@ const ANATOMY_STEPS = [
     desc: "The rear segment (opisthosoma) houses the heart, respiratory organs (book lungs), and the reproductive system. Unlike the cephalothorax, the abdomen has no external appendages.",
     camera: [-0.94, 3.7, -3.4],
     target: [2, -1.5, -0.2],
-    customPos: { bottom: 38.89, left: 3.33 },
+    customPos: { bottom: 40, left: 4 },
   },
   {
     id: "conclusion",
@@ -218,7 +218,7 @@ function Desktop3DView({ currentStep, setViewMode, containerRef }) {
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
           className="flex flex-col pointer-events-auto items-start text-justify"
         >
-          <h2 className="text-5xl md:text-6xl font-serif text-ink mb-8 leading-none tracking-tighter drop-shadow-[0_2px_10px_rgba(253,250,240,0.8)]">
+          <h2 className="text-5xl md:text-6xl font-serif text-ink mb-4 leading-none tracking-tighter drop-shadow-[0_2px_10px_rgba(253,250,240,0.8)]">
             {step.title}
           </h2>
           <p className="text-lg text-justify md:text-xl text-ink/70 font-medium leading-relaxed max-w-[425px] drop-shadow-[0_1px_5px_rgba(253,250,240,0.5)]">
