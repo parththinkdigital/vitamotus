@@ -9,6 +9,7 @@ const ADMIN_NAV = [
   { name: 'Species', href: '/admin/species', icon: '🔬' },
   { name: 'Families', href: '/admin/families', icon: '🌳' },
   { name: 'Genera', href: '/admin/genera', icon: '📂' },
+  { name: 'Blog', href: '/admin/blogs', icon: '📝' },
 ];
 
 export default function AdminLayout({ children }) {

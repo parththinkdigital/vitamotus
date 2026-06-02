@@ -1,167 +1,166 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import CardSwap, { Card } from "./CardSwap";
+import { useRef, useMemo } from "react";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { useReducedMotion } from "framer-motion";
 
-const GALLERY_SPECIMENS = [
-  { 
-    id: "VM-0017", 
-    name: "Argiope bruennichi", 
-    common: "Wasp Spider", 
-    family: "Araneidae", 
-    img: "/hero-img/spider-img-01.jpg", 
-    desc: "A striking orb-weaver known for its yellow and black abdominal stripes, mimicry designed to deter avian predators." 
-  },
-  { 
-    id: "VM-0042", 
-    name: "Nephila clavipes", 
-    common: "Golden Silk Orb-Weaver", 
-    family: "Nephilidae", 
-    img: "/hero-img/spider-img-02.jpg", 
-    desc: "Produces silk of incredible strength and a unique golden hue, creating webs that can span several meters." 
-  },
-  { 
-    id: "VM-0093", 
-    name: "Theraphosa blondi", 
-    common: "Goliath Birdeater", 
-    family: "Theraphosidae", 
-    img: "/hero-img/spider-img-03.jpg", 
-    desc: "The world's largest spider by mass and size, this terrestrial tarantula is a master of the forest floor." 
-  },
-  { 
-    id: "VM-0128", 
-    name: "Maratus volans", 
-    common: "Peacock Spider", 
-    family: "Salticidae", 
-    img: "/hero-img/spider-img-04.jpg", 
-    desc: "A miniature marvel known for its vivid colors and complex rhythmic courtship displays." 
-  },
-  { 
-    id: "VM-0201", 
-    name: "Phoneutria nigriventer", 
-    common: "Brazilian Wandering", 
-    family: "Ctenidae", 
-    img: "/hero-img/spider-img-05.jpg", 
-    desc: "Highly defensive and active at night, this specimen is studied for its unique neurotoxic venom profiles." 
-  },
-];
+const EASE_OUT = [0.23, 1, 0.32, 1];
+
+const HERO_IMAGES = Array.from(
+  { length: 16 },
+  (_, i) => ({
+    src: `/hero-img/hero-${String(i + 1).padStart(2, "0")}.jpg`,
+    alt: `Hero specimen ${i + 1}`,
+  })
+);
+
+function SplitReveal({ children, className = "" }) {
+  const text = String(children);
+  return (
+    <span className={className} aria-label={children}>
+      {text.split("").map((char, i) => (
+        <span
+          key={i}
+          className="split-char inline-block"
+          aria-hidden="true"
+        >
+          {char === " " ? "\u00A0" : char}
+        </span>
+      ))}
+    </span>
+  );
+}
 
 export default function SpecimenGallery() {
-  const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const sectionRef = useRef(null);
+  const navRef = useRef(null);
+  const titleRef = useRef(null);
+  const subtitleRef = useRef(null);
+  const trackRef = useRef(null);
+  const shouldReduce = useReducedMotion();
+
+  useGSAP(
+    () => {
+      if (shouldReduce) {
+        gsap.set([navRef.current, titleRef.current, subtitleRef.current], {
+          opacity: 1,
+        });
+        gsap.set(".split-char", { opacity: 1, y: 0 });
+        gsap.set(trackRef.current, { opacity: 1 });
+        return;
+      }
+
+      const tl = gsap.timeline({ defaults: { ease: EASE_OUT } });
+
+      tl.fromTo(
+        navRef.current,
+        { opacity: 0, y: -12 },
+        { opacity: 1, y: 0, duration: 0.5 }
+      )
+        .fromTo(
+          trackRef.current,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.8 },
+          "-=0.2"
+        )
+        .fromTo(
+          ".carousel-card",
+          { clipPath: "inset(0 100% 0 0)" },
+          {
+            clipPath: "inset(0 0 0 0)",
+            stagger: 0.04,
+            duration: 0.7,
+            ease: EASE_OUT,
+          },
+          "-=0.5"
+        )
+        .fromTo(
+          ".split-char",
+          { opacity: 0, y: 48, rotateX: -12 },
+          { opacity: 1, y: 0, rotateX: 0, stagger: 0.035, duration: 0.7 },
+          "-=0.3"
+        )
+        .fromTo(
+          subtitleRef.current,
+          { opacity: 0, y: 16 },
+          { opacity: 1, y: 0, duration: 0.5 },
+          "-=0.1"
+        );
+
+      const track = trackRef.current;
+      if (track) {
+        gsap.to(track, {
+          x: () => -(track.scrollWidth / 2),
+          duration: 50,
+          ease: "none",
+          repeat: -1,
+        });
+      }
+    },
+    { scope: sectionRef }
+  );
+
 
   return (
-    <section className="w-full py-40 bg-parchment relative overflow-hidden border-t border-ink/5">
-      {/* Background Decorative Element */}
-      <div className="absolute top-20 left-10 -rotate-90 origin-top-left pointer-events-none opacity-[0.03] select-none">
-        <span className="text-[10vw] font-serif font-black text-ink whitespace-nowrap leading-none uppercase">
-          Vitamotus Archive
-        </span>
+    <section
+      ref={sectionRef}
+      className="relative min-h-screen w-full bg-ink text-parchment overflow-hidden"
+    >
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#1a2f25_0%,#0a120e_60%,#060a08_100%)]" />
+      <div
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.06) 1px, transparent 0)",
+          backgroundSize: "3px 3px",
+        }}
+      />
+
+      {/* Cinematic carousel */}
+      <div className="relative z-10 flex items-center justify-center w-full h-[50vh] md:h-[55vh] overflow-hidden top-[7.5rem]">
+        <div
+          className="w-full max-w-full  mx-auto overflow-hidden
+            [mask-image:linear-gradient(to_right,transparent_0%,black_8%,black_92%,transparent_100%)]"
+        >
+          <div
+            ref={trackRef}
+            className="flex gap-2 md:gap-4"
+          >
+            {HERO_IMAGES.map((img, i) => (
+              <div
+                key={i}
+                className="carousel-card relative shrink-0 h-[40vh] md:h-[45vh] border border-parchment/8 bg-white/[0.02] overflow-hidden rounded-md"
+              >
+                <img
+                  src={img.src}
+                  alt={img.alt}
+                  className="h-full w-auto contrast-[0.9] brightness-[0.8] saturate-[0.5]"
+                  draggable={false}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-8 md:px-16 flex flex-col lg:flex-row items-center gap-20 relative z-10">
-        
-        {/* Left Side: Specimen Details */}
-        <div className="w-full lg:w-1/2 space-y-12">
-          <div className="space-y-6">
-            <div className="flex items-center gap-4">
-              <span className="text-[11px] font-bold uppercase tracking-[0.8em] text-moss block">Visual Catalog</span>
-              <div className="h-[1px] w-12 bg-moss/20" />
-            </div>
-            
-            <h2 className="text-5xl md:text-7xl font-serif text-ink italic leading-tight tracking-tight">
-              Digital <span className="not-italic text-ink/20">Specimen</span> Gallery.
-            </h2>
-          </div>
-
-          <div className="relative min-h-[350px] pl-8 border-l border-moss/10">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeCardIndex}
-                initial={{ opacity: 0, x: -20, filter: "blur(10px)" }}
-                animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, x: 20, filter: "blur(10px)" }}
-                transition={{ 
-                  duration: 0.8, 
-                  ease: [0.22, 1, 0.36, 1] 
-                }}
-                className="space-y-10"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-moss">
-                      REF_{GALLERY_SPECIMENS[activeCardIndex].id}
-                    </span>
-                    <div className="w-1.5 h-1.5 rounded-full bg-moss/20" />
-                    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-ink/30">
-                      Family: {GALLERY_SPECIMENS[activeCardIndex].family}
-                    </span>
-                  </div>
-                  
-                  <h3 className="text-4xl md:text-5xl font-serif text-ink italic tracking-tight leading-none">
-                    {GALLERY_SPECIMENS[activeCardIndex].name}
-                  </h3>
-                  
-                  <p className="text-[12px] font-bold uppercase tracking-[0.5em] text-moss">
-                    {GALLERY_SPECIMENS[activeCardIndex].common}
-                  </p>
-                </div>
-
-                <p className="text-xl text-ink/60 font-serif leading-relaxed max-w-lg italic">
-                  "{GALLERY_SPECIMENS[activeCardIndex].desc}"
-                </p>
-
-                <div className="flex gap-6 pt-4">
-                  <button className="px-10 py-5 bg-ink text-parchment rounded-2xl font-bold transition-all duration-500 hover:bg-moss shadow-xl hover:shadow-2xl active:scale-95">
-                    <span className="uppercase tracking-[0.3em] text-[10px]">View Full Specimen</span>
-                  </button>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
+      {/* Bottom row: title left, description right — anchored to baseline */}
+      <div className="absolute bottom-0 left-0 right-0 z-10 px-8 md:px-16 pb-8 md:pb-12">
+        <div className="flex items-end justify-between gap-8">
+          <h1
+            ref={titleRef}
+            className="font-display text-[clamp(3.5rem,14vw,11rem)] font-bold leading-[0.82] tracking-[-0.05em] text-parchment shrink-0"
+          >
+            <SplitReveal>Gallery</SplitReveal>
+          </h1>
+          <p
+            ref={subtitleRef}
+            className="max-w-[280px] text-right text-xs md:text-sm text-parchment/25 font-sans leading-relaxed"
+          >
+            An immersive digital archive exploring the architectural elegance
+            and kinetic precision of arachnid lifeforms.
+          </p>
         </div>
-
-        {/* Right Side: The Clean Card Stack */}
-        <div className="w-full lg:w-1/2 relative h-[600px] flex items-center justify-center">
-          <div className="absolute inset-0 bg-gradient-to-tr from-moss/5 via-transparent to-moss/5 blur-[100px] rounded-full pointer-events-none opacity-40" />
-          
-          <div className="relative w-full h-full max-w-[450px]">
-            <CardSwap
-              activeIndex={activeCardIndex}
-              width={380}
-              height={500}
-              delay={5000}
-              onSwap={(idx) => setActiveCardIndex(idx)}
-            >
-              {GALLERY_SPECIMENS.map((specimen, i) => (
-                <Card 
-                  key={specimen.id} 
-                  onClick={() => setActiveCardIndex(i)}
-                  className="cursor-pointer"
-                >
-                  <div className="relative w-full h-full">
-                    <Image
-                      src={specimen.img}
-                      alt={specimen.name}
-                      fill
-                      className="object-cover"
-                      priority={i < 3}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
-                    
-                    {/* Content on the card */}
-                    <div className="absolute bottom-10 left-10 right-10 flex flex-col gap-2">
-                       <span className="text-[9px] font-mono font-bold uppercase tracking-[0.3em] text-white/50">{specimen.id}</span>
-                       <h4 className="text-2xl font-serif text-white italic tracking-tighter">{specimen.name}</h4>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </CardSwap>
-          </div>
-        </div>
-
       </div>
     </section>
   );

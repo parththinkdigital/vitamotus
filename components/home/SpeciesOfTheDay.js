@@ -1,15 +1,35 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { taxonomyApi, getImageUrl } from "@/lib/api";
+import { taxonomyApi } from "@/lib/api";
 import Link from "next/link";
 
-const TAXONOMY_PATH = ["Arthropoda", "Arachnida", "Araneae", "Theraphosidae", "Poecilotheria", "P. metallica"];
+const easing = [0.23, 1, 0.32, 1];
 
-export default function SpeciesOfTheDay({ isHorizontal = false }) {
+const cardVariants = {
+  hidden: { opacity: 0, y: 30, filter: "blur(6px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.5, ease: easing },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: 0.2 + i * 0.06, duration: 0.35, ease: easing },
+  }),
+};
+
+export default function SpeciesOfTheDay() {
   const [species, setSpecies] = useState(null);
   const [loading, setLoading] = useState(true);
+  const shouldReduce = useReducedMotion();
 
   useEffect(() => {
     async function loadFeatured() {
@@ -25,93 +45,132 @@ export default function SpeciesOfTheDay({ isHorizontal = false }) {
     loadFeatured();
   }, []);
 
-  if (loading || !species) return (
-    <div className={`h-[500px] w-full bg-parchment/50 animate-pulse rounded-[3rem] border border-ink/5 flex items-center justify-center`}>
-      <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-ink/20">Syncing with Archive...</span>
-    </div>
-  );
+  if (loading || !species) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <span className="font-mono text-[10px] font-bold uppercase tracking-[0.4em] text-ink/15">
+          Loading archive log...
+        </span>
+      </div>
+    );
+  }
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className={`bg-parchment/80 backdrop-blur-2xl rounded-[3rem] overflow-hidden shadow-2xl border border-ink/5 flex ${isHorizontal ? 'flex-col lg:flex-row' : 'flex-col'} group`}
+    <motion.div
+      variants={!shouldReduce ? cardVariants : undefined}
+      initial={shouldReduce ? undefined : "hidden"}
+      whileInView="visible"
+      viewport={{ once: true, margin: "-60px" }}
+      className="group relative overflow-hidden rounded-[2rem] border border-ink/8 bg-gradient-to-b from-parchment to-parchment/95 px-8 py-8 shadow-lg sm:px-11 sm:py-10"
     >
-      {/* ─── IMAGE AREA ─── */}
-      <div className={`relative overflow-hidden ${isHorizontal ? 'w-full lg:w-1/2 min-h-[500px]' : 'h-[400px]'} bg-ink`}>
-        <div className="absolute top-8 left-8 z-20 bg-moss text-parchment text-[10px] font-bold uppercase tracking-[0.4em] px-6 py-3 rounded-full flex items-center gap-3 shadow-2xl">
-          <div className="w-1.5 h-1.5 rounded-full bg-parchment animate-pulse" />
-          Field Spotlight
-        </div>
-        
-        <img 
-          src={getImageUrl(species)}
-          alt={species.scientific_name}
-          className="w-full h-full object-cover opacity-80 transition-transform duration-[2000ms] group-hover:scale-110 grayscale-[0.2] group-hover:grayscale-0"
-        />
-        
-        <motion.div 
-          animate={{ x: ["-100%", "100%"] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-          className="absolute top-0 bottom-0 w-[2px] bg-gradient-to-r from-transparent via-moss/40 to-transparent z-10"
-        />
-
-        <div className="absolute bottom-8 left-8 z-20 flex flex-col gap-1 text-left">
-           <span className="text-[9px] font-mono text-parchment/60 uppercase tracking-[0.2em]">Lens: 2.4x Zoom</span>
-           <span className="text-[9px] font-mono text-parchment/60 uppercase tracking-[0.2em]">Exposure: -1.2 EV</span>
-        </div>
+      <div className="pointer-events-none absolute -right-16 -top-16 select-none">
+        <span className="font-serif text-[18rem] font-bold leading-[0.7] tracking-[-0.06em] text-ink/[0.02]">
+          {String(species.wsc_species_id || "00").slice(-2)}
+        </span>
       </div>
 
-      {/* ─── DATA AREA ─── */}
-      <div className={`p-12 lg:p-16 flex flex-col justify-between ${isHorizontal ? 'w-full lg:w-1/2' : 'w-full'}`}>
-        <div className="space-y-10 text-left">
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-               <span className="text-[10px] font-mono font-bold text-moss tracking-[0.2em] uppercase">Archive Log_{species.wsc_species_id}</span>
-               <div className="h-[1px] w-12 bg-moss/20" />
-            </div>
-            <h3 className="text-5xl lg:text-7xl font-serif italic text-ink leading-none tracking-tighter">
-              {species.scientific_name}
-            </h3>
-            <p className="text-sm font-bold text-ink/40 tracking-[0.3em] uppercase">{species.common_name || 'Accepted Scientific Species'}</p>
+      <div className="relative z-10 space-y-6 sm:space-y-7">
+        <motion.div
+          variants={!shouldReduce ? itemVariants : undefined}
+          initial={shouldReduce ? undefined : "hidden"}
+          whileInView="visible"
+          viewport={{ once: true }}
+          custom={0}
+        >
+          <div className="flex items-center gap-4">
+            <span className="font-mono text-[9px] font-bold tracking-[0.3em] text-moss uppercase">
+              Archive Log_{species.wsc_species_id}
+            </span>
+            <div className="h-px flex-1 bg-moss/10" />
           </div>
+          <h3 className="mt-3 font-serif text-4xl font-bold italic leading-tight tracking-tight text-ink sm:text-5xl lg:text-6xl">
+            {species.scientific_name}
+          </h3>
+          {species.common_name && (
+            <p className="mt-2 text-xs font-bold uppercase tracking-[0.35em] text-ink/35 sm:text-sm">
+              {species.common_name}
+            </p>
+          )}
+        </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+        <motion.div
+          variants={!shouldReduce ? itemVariants : undefined}
+          initial={shouldReduce ? undefined : "hidden"}
+          whileInView="visible"
+          viewport={{ once: true }}
+          custom={1}
+        >
+          <div className="flex flex-wrap gap-x-8 gap-y-3">
             {[
-              { label: "Family", value: species.family.name },
-              { label: "Distribution", value: species.distribution },
-              { label: "Status", value: species.taxon_status },
+              {
+                label: "Family",
+                value: species.family.name,
+              },
+              {
+                label: "Distribution",
+                value: species.distribution,
+              },
+  
+              { label: "Year", value: species.year },
             ].map((item) => (
-              <div key={item.label} className="space-y-2 border-l border-moss/10 pl-6">
-                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-ink/20">{item.label}</span>
-                <p className="text-sm text-ink/80 font-medium leading-relaxed">{item.value}</p>
+              <div key={item.label} className="space-y-1">
+                <span className="block font-mono text-[8px] font-bold uppercase tracking-[0.35em] text-ink/20">
+                  {item.label}
+                </span>
+                <p className="text-sm font-medium text-ink/70 sm:text-base">
+                  {item.value}
+                </p>
               </div>
             ))}
           </div>
+        </motion.div>
 
-          <div className="space-y-3 pt-6 border-t border-ink/5">
-             <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-ink/20 block">Archivist's Note</span>
-             <p className="text-lg font-serif italic text-ink/60 leading-relaxed max-w-lg">
-               "{species.vitamotus_notes || "A distinctive member of the " + species.family.name + " family, cataloged by " + species.authority + " in " + species.year + "."}"
-             </p>
+        <motion.div
+          variants={!shouldReduce ? itemVariants : undefined}
+          initial={shouldReduce ? undefined : "hidden"}
+          whileInView="visible"
+          viewport={{ once: true }}
+          custom={2}
+          className="border-t border-ink/5 pt-6"
+        >
+          <span className="block font-mono text-[8px] font-bold uppercase tracking-[0.35em] text-ink/20">
+            Archivist&rsquo;s Note
+          </span>
+          <div className="relative mt-2">
+            <span className="absolute -left-1 -top-1 font-serif text-5xl leading-none text-moss/15">
+              &ldquo;
+            </span>
+            <p className="relative pl-6 font-serif text-base italic leading-relaxed text-ink/60 sm:text-lg">
+              {species.vitamotus_notes ||
+                "A distinctive member of the " +
+                  species.family.name +
+                  " family, cataloged by " +
+                  species.authority +
+                  " in " +
+                  species.year +
+                  "."}
+            </p>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="mt-12 flex flex-col sm:flex-row gap-6">
-          <Link 
-            href={`/species/${species.scientific_name.replace(/ /g, '-')}`}
-            className="flex-1 py-6 bg-ink text-parchment rounded-2xl text-[10px] font-bold text-center uppercase tracking-[0.4em] hover:bg-moss transition-all duration-500 shadow-xl group"
+        <motion.div
+          variants={!shouldReduce ? itemVariants : undefined}
+          initial={shouldReduce ? undefined : "hidden"}
+          whileInView="visible"
+          viewport={{ once: true }}
+          custom={3}
+          className="!mt-8"
+        >
+          <Link
+            href={`/species/${species.scientific_name.replace(/ /g, "-")}`}
+            className="group/btn inline-flex cursor-pointer items-center gap-3 rounded-2xl bg-ink px-8 py-4 font-mono text-[10px] font-bold uppercase tracking-[0.4em] text-parchment shadow-xl transition-all duration-200 ease-out hover:bg-moss hover:shadow-2xl active:scale-[0.97]"
           >
-            Launch Full Analysis <span className="ml-4 inline-block transition-transform group-hover:translate-x-2">→</span>
+            View Details
+            <span className="inline-block transition-transform duration-200 ease-out group-hover/btn:translate-x-1.5">
+              →
+            </span>
           </Link>
-          <div className="flex items-center gap-4 px-6 border border-ink/5 rounded-2xl">
-             <div className="flex -space-x-2">
-                {[1,2,3].map(i => <div key={i} className="w-8 h-8 rounded-full border-2 border-parchment bg-moss/20" />)}
-             </div>
-             <span className="text-[9px] font-bold text-ink/30 uppercase tracking-widest">12 Verified Scans</span>
-          </div>
-        </div>
+        </motion.div>
       </div>
     </motion.div>
   );

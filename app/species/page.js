@@ -105,9 +105,11 @@ export default function SpeciesPage() {
             />
             
             {/* Elegant Filter Bar */}
-            <div className="flex flex-col lg:flex-row gap-4 items-center justify-between p-2 bg-white/40 backdrop-blur-xl rounded-[2rem] border border-ink/5 shadow-sm">
+            <div className="flex flex-col lg:flex-row gap-4 items-center justify-between p-2 bg-parchment/80 backdrop-blur-xl rounded-[2rem] border border-ink/5 shadow-sm">
                 <div className="relative flex-1 w-full group">
-                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-xl opacity-20 group-focus-within:opacity-100 transition-opacity">🔍</span>
+                    <span className="absolute left-6 top-1/2 -translate-y-1/2 opacity-20 group-focus-within:opacity-100 transition-opacity">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </span>
                     <input 
                         type="text"
                         placeholder="Search scientific records..."
@@ -143,8 +145,8 @@ export default function SpeciesPage() {
           {/* Directory Content */}
           {error ? (
             <div className="py-32 text-center space-y-8">
-               <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto">
-                  <span className="text-2xl">⚠️</span>
+               <div className="w-20 h-20 bg-moss/10 rounded-full flex items-center justify-center mx-auto">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#496B4A" strokeWidth="1.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                </div>
                <p className="text-xl font-serif text-ink italic opacity-40 max-w-md mx-auto">{error}</p>
             </div>
@@ -165,75 +167,77 @@ export default function SpeciesPage() {
                 <AnimatePresence mode="popLayout">
                   {loading ? (
                     [...Array(6)].map((_, i) => (
-                      <div key={`shimmer-${i}`} className="aspect-[4/5] bg-white rounded-[3rem] border border-ink/5 animate-pulse" />
+                      <div key={`shimmer-${i}`} className="aspect-[4/5] bg-moss/60 rounded-[3rem] motion-safe:animate-pulse" />
                     ))
                   ) : (
-                    species.map((item, index) => (
+                    species.map((item, index) => {
+                      const hasImage = item.profile?.photo_gallery_urls?.length > 0;
+                      return (
                       <motion.div
                         key={item.id}
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 0.5, delay: index * 0.05 }}
+                        transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1], delay: index * 0.04 }}
                       >
                         <Link 
                           href={`/species/${item.scientific_name.replace(/ /g, '-')}`}
-                          className="group block aspect-[4/5] bg-white border border-ink/5 rounded-[3rem] p-10 relative overflow-hidden transition-all duration-700 hover:shadow-[0_40px_80px_rgba(0,0,0,0.05)] hover:-translate-y-2"
+                          className="group block aspect-[4/5] bg-moss rounded-[3rem] p-10 relative overflow-hidden transition-all duration-500 hover:shadow-[0_0_0_1px_rgba(244,234,215,0.15),0_20px_40px_-8px_rgba(0,0,0,0.2)] active:scale-[0.98]"
                         >
-                          {/* Card Background Hint */}
-                          <div className="absolute inset-0 opacity-[0.03] group-hover:opacity-[0.12] transition-all duration-700 group-hover:scale-110">
-                             <img 
-                               src={getImageUrl(item)} 
-                               alt="" 
-                               className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                             />
-                          </div>
-
-                          {/* Light Flash Effect */}
-                          <div className="absolute inset-0 bg-gradient-to-tr from-moss/0 via-moss/5 to-moss/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                          {/* Card Background Hint - only when real images exist */}
+                          {hasImage && (
+                            <div className="absolute inset-0 opacity-[0.06] group-hover:opacity-[0.12] transition-all duration-700 group-hover:scale-105">
+                               <img 
+                                 src={getImageUrl(item)} 
+                                 alt="" 
+                                 className="w-full h-full object-cover"
+                               />
+                            </div>
+                          )}
 
                           <div className="relative h-full flex flex-col justify-between z-10">
                              <div className="flex justify-between items-start">
                                 <div className="space-y-1">
-                                   <span className="text-[9px] font-bold uppercase tracking-widest text-moss block">
+                                   <span className="text-[9px] font-bold uppercase tracking-widest text-parchment/40 block">
                                       {item.family.name}
                                    </span>
-                                   <span className="text-[8px] font-bold uppercase tracking-widest text-ink/20 block">
+                                   <span className="text-[8px] font-bold uppercase tracking-widest text-parchment/20 block">
                                       Genus: {item.genus.name}
                                    </span>
                                 </div>
-                                <div className="w-10 h-10 rounded-2xl bg-parchment flex items-center justify-center border border-ink/5 group-hover:bg-ink group-hover:text-parchment transition-all duration-500">
-                                   <span className="text-xl">→</span>
+                                <div className="w-10 h-10 rounded-2xl bg-parchment/10 flex items-center justify-center border border-parchment/10 group-hover:bg-parchment group-hover:text-moss transition-all duration-300">
+                                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                                 </div>
                              </div>
 
                              <div className="space-y-6">
                                 <div className="space-y-2">
-                                   <h3 className="text-3xl font-serif text-ink italic leading-tight">
+                                   <h3 className="text-3xl font-serif text-parchment italic leading-tight">
                                       {item.scientific_name}
                                    </h3>
-                                   <p className="text-[10px] font-bold text-ink/30 uppercase tracking-[0.3em]">
+                                   <p className="text-[10px] font-bold text-parchment/30 uppercase tracking-[0.3em]">
                                       {item.authority} {item.year}
                                    </p>
                                 </div>
 
-                                <div className="pt-6 border-t border-ink/5 space-y-3">
+                                <div className="pt-6 border-t border-parchment/10 space-y-3">
                                    <div className="flex items-center gap-2">
-                                      <div className="w-1 h-1 rounded-full bg-moss/40" />
-                                      <span className="text-[10px] text-ink/40 font-medium truncate italic">{item.distribution || 'Global Archive'}</span>
+                                      <div className="w-1 h-1 rounded-full bg-parchment/30" />
+                                      <span className="text-[10px] text-parchment/30 font-medium truncate italic">{item.distribution || 'Global Archive'}</span>
                                    </div>
                                    <div className="flex gap-2">
                                       {item.profile_status === 'complete' && (
-                                         <span className="px-3 py-1 bg-moss/10 text-moss text-[8px] font-bold uppercase tracking-widest rounded-full">Detailed Profile</span>
+                                         <span className="px-3 py-1 bg-parchment/10 text-parchment/60 text-[8px] font-bold uppercase tracking-widest rounded-full">Detailed Profile</span>
                                       )}
-                                      <span className="px-3 py-1 bg-ink/5 text-ink/30 text-[8px] font-bold uppercase tracking-widest rounded-full">{item.taxon_status}</span>
+                                      <span className="px-3 py-1 bg-parchment/5 text-parchment/30 text-[8px] font-bold uppercase tracking-widest rounded-full">{item.taxon_status}</span>
                                    </div>
                                 </div>
                              </div>
                           </div>
                         </Link>
                       </motion.div>
-                    ))
+                      );
+                    })
                   )}
                 </AnimatePresence>
                </div>

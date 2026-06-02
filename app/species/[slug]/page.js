@@ -3,9 +3,16 @@
 import { useState, useEffect } from "react";
 import { taxonomyApi, getImageUrl } from "@/lib/api";
 import MainLayout from "@/components/layout/MainLayout";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+
+const fadeUp = {
+  initial: { opacity: 0, y: 16 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-60px" },
+  transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] },
+};
 
 export default function SpeciesProfilePage() {
   const params = useParams();
@@ -39,11 +46,12 @@ export default function SpeciesProfilePage() {
     return (
       <MainLayout>
         <div className="min-h-screen bg-parchment flex items-center justify-center">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-2 border-moss border-t-transparent rounded-full"
-          />
+          <div className="flex flex-col items-center gap-6">
+            <div className="w-10 h-10 rounded-full border-2 border-moss/20 border-t-moss animate-spin motion-reduce:animate-none motion-reduce:border-moss/40" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-ink/20 motion-reduce:text-ink/40">
+              Loading Specimen
+            </span>
+          </div>
         </div>
       </MainLayout>
     );
@@ -60,7 +68,7 @@ export default function SpeciesProfilePage() {
             </p>
             <Link
               href="/species"
-              className="inline-block px-12 py-5 bg-ink text-parchment rounded-2xl font-bold uppercase tracking-[0.3em] text-[10px] hover:bg-moss transition-all duration-500"
+              className="inline-block px-12 py-5 bg-ink text-parchment rounded-2xl font-bold uppercase tracking-[0.3em] text-[10px] hover:bg-moss transition-colors duration-500 active:scale-[0.97]"
             >
               Return to Directory
             </Link>
@@ -70,80 +78,57 @@ export default function SpeciesProfilePage() {
     );
 
   const profile = specimen.profile || {};
+  const hasGallery = profile.photo_gallery_urls?.length > 0;
 
   return (
     <MainLayout>
       <div className="relative min-h-screen bg-parchment pb-32 overflow-hidden selection:bg-moss/20">
-        {/* ─── FIELD JOURNAL BACKGROUND TEXTURES ─── */}
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
-          <div className="absolute inset-0">
-            <img 
-              src="/assets/web/web-01.png.png" 
-              alt="Web Pattern" 
-              className="w-full h-full object-cover opacity-[0.1] mix-blend-multiply"
-            />
-          </div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:32px_32px]" />
-          
-          {/* Large Scale Taxonomy Watermark */}
-          <div className="absolute top-1/2 left-0 flex flex-col opacity-[0.03] -rotate-90 origin-left">
-             <span className="text-[180px] font-serif tracking-tighter uppercase pointer-events-none whitespace-nowrap">Taxonomic_Specimen_Profile</span>
-          </div>
-        </div>
-
-        <div className="relative z-10">
-        {/* Cinematic Header */}
+        {/* Hero */}
         <div className="relative h-[70vh] bg-ink overflow-hidden">
-          <motion.div
-            key={activeImage}
-            initial={{ scale: 1.1, opacity: 0 }}
-            animate={{ scale: 1, opacity: 0.4 }}
-            transition={{ duration: 2 }}
-            className="absolute inset-0"
-          >
-            <img
-              src={activeImage}
-              alt=""
-              className="w-full h-full object-cover grayscale"
-            />
-          </motion.div>
-
           <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent" />
 
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center space-y-8 px-8 max-w-4xl">
+            <div className="text-center px-8 max-w-4xl">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="flex items-center justify-center gap-6"
+                transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1], delay: 0.15 }}
+                className="flex items-center justify-center gap-6 mb-8"
               >
-                <div className="h-[1px] w-12 bg-moss/40" />
-                <span className="text-[11px] font-bold uppercase tracking-[0.5em] text-moss">
-                  Specimen Entry No. {specimen.wsc_species_id}
-                </span>
-                <div className="h-[1px] w-12 bg-moss/40" />
+                <div className="h-px w-12 bg-moss/40" />
+                <div className="h-px w-12 bg-moss/40" />
               </motion.div>
 
               <motion.h1
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
+                transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1], delay: 0.3 }}
                 className="text-7xl md:text-9xl font-serif text-parchment italic leading-none tracking-tighter"
               >
                 {specimen.scientific_name}
               </motion.h1>
 
+              {specimen.subspecies && (
+                <motion.p
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1], delay: 0.38 }}
+                  className="text-2xl md:text-3xl font-serif text-parchment/30 italic tracking-wide mt-4"
+                >
+                  subsp. {specimen.subspecies}
+                </motion.p>
+              )}
+
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1 }}
-                className="space-y-2"
+                transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1], delay: 0.45 }}
+                className="mt-6"
               >
                 <p className="text-parchment/40 font-serif italic text-2xl">
                   {specimen.authority} {specimen.year}
                 </p>
-                <div className="flex items-center justify-center gap-4 pt-4">
+                <div className="flex items-center justify-center gap-3 mt-4">
                   <span className="px-4 py-1 rounded-full border border-parchment/10 text-[9px] font-bold uppercase tracking-widest text-parchment/30 italic">
                     {specimen.taxon_status}
                   </span>
@@ -157,368 +142,388 @@ export default function SpeciesProfilePage() {
             </div>
           </div>
 
-          {/* Breadcrumbs */}
-          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-6 text-[10px] font-bold uppercase tracking-[0.3em] text-parchment/20 whitespace-nowrap overflow-hidden px-8">
-            <Link href="/species" className="hover:text-moss transition-colors">
-              Directory
-            </Link>
-            <span className="opacity-10">/</span>
-            <Link
-              href={`/family/${specimen.family.name}`}
-              className="hover:text-moss transition-colors"
-            >
-              {specimen.family.name}
-            </Link>
-            <span className="opacity-10">/</span>
-            <span className="text-parchment/60 italic">
-              {specimen.genus.name}
-            </span>
-          </div>
+          {specimen.family && (
+            <nav className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-6 text-[10px] font-bold uppercase tracking-[0.3em] text-parchment/20 px-8">
+
+              <span className="opacity-10">/</span>
+              <Link href={`/family/${specimen.family.name}`} className="hover:text-moss transition-colors duration-300">
+                {specimen.family.name}
+              </Link>
+              <span className="opacity-10">/</span>
+              <span className="text-parchment/60 italic">{specimen.genus?.name}</span>
+            </nav>
+          )}
         </div>
 
-        <div className="max-w-7xl mx-auto -mt-20 relative z-20 px-8 md:px-16 grid grid-cols-1 lg:grid-cols-12 gap-16 md:gap-24">
-          {/* LEFT COLUMN: Data & Descriptions */}
-          <div className="lg:col-span-8 space-y-24">
-            {/* Overview & Quick Stats */}
-            <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <StatCard
-                label="Common Name"
-                value={specimen.common_name || "N/A"}
-                icon="🏷️"
-              />
-              <StatCard
-                label="Habitat"
-                value={profile.habitat || "Forest/Shrubland"}
-                icon="🌿"
-              />
-              <StatCard
-                label="Web Type"
-                value={profile.web_type || "Orb-Web"}
-                icon="🕸️"
-              />
-            </section>
+        {/* Content: Editorial layout */}
+        <div className="mx-auto relative z-10 px-8 md:px-20 lg:px-28 space-y-20 md:space-y-15">
 
-            {/* Cool & Nice Specimen Visualization Section */}
-            <section className="space-y-12">
-              <ChapterHeading
-                title="Visual Analysis"
-                subtitle="High-Fidelity Specimen Plate"
-              />
-
-              <div className="relative group">
-                {/* The Specimen Plate */}
-                <div className="relative aspect-video rounded-[3rem] overflow-hidden bg-ink shadow-2xl border border-white/5">
-                  <motion.img
-                    key={activeImage}
-                    initial={{ scale: 1.2, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 1.5 }}
-                    src={activeImage}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[3s]"
-                    alt={specimen.scientific_name}
-                  />
-
-                  {/* Interactive UI Overlays */}
-                  <div className="absolute inset-0 pointer-events-none">
-                    {/* Scanning Line */}
+              {/* Habitat card + Image — side by side */}
+              {(profile.habitat || hasGallery) && (
+                <div className={`grid gap-8 md:gap-12 items-start ${profile.habitat && hasGallery ? 'grid-cols-1 md:grid-cols-[1fr_2fr]' : ''}`}>
+                  {profile.habitat && (
+                    <motion.div {...fadeUp} className="-mt-10 md:-mt-16 [&>div]:!p-6 md:[&>div]:!p-10 [&>div>p]:!text-xl md:[&>div>p]:!text-3xl">
+                      <StatCard label="Habitat" value={profile.habitat}>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                      </StatCard>
+                    </motion.div>
+                  )}
+                  {hasGallery && (
                     <motion.div
-                      animate={{ top: ["0%", "100%", "0%"] }}
-                      transition={{
-                        duration: 10,
-                        repeat: Infinity,
-                        ease: "linear",
-                      }}
-                      className="absolute left-0 w-full h-[2px] bg-moss/30 blur-sm z-10"
-                    />
+                      initial={{ opacity: 0, y: 24 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+                      className="relative aspect-[4/3] overflow-hidden bg-ink rounded-3xl shadow-xl mt-30"
+                    >
+                      <motion.img
+                        key={activeImage}
+                        initial={{ scale: 1.05, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
+                        src={activeImage}
+                        className="w-full h-full object-cover top-0 left"
+                        alt={specimen.scientific_name}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent pointer-events-none" />
+                      <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
+                        <p className="text-xl md:text-2xl font-serif text-parchment italic leading-tight mt-1">
+                          {specimen.scientific_name}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+              )}
 
-                    {/* Corner Accents */}
-                    <div className="absolute top-8 left-8 w-12 h-12 border-t-2 border-l-2 border-moss/40 rounded-tl-2xl" />
-                    <div className="absolute top-8 right-8 w-12 h-12 border-t-2 border-r-2 border-moss/40 rounded-tr-2xl" />
-                    <div className="absolute bottom-8 left-8 w-12 h-12 border-b-2 border-l-2 border-moss/40 rounded-bl-2xl" />
-                    <div className="absolute bottom-8 right-8 w-12 h-12 border-b-2 border-r-2 border-moss/40 rounded-br-2xl" />
+              {/* Quick Stats — remaining */}
+              {(specimen.common_name || profile.web_type) && (
+                <motion.section {...fadeUp} className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                  {specimen.common_name && (
+                    <StatCard label="Common Name" value={specimen.common_name}>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                    </StatCard>
+                  )}
+                  {profile.web_type && (
+                    <StatCard label="Web Type" value={profile.web_type}>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/><line x1="4.93" y1="19.07" x2="19.07" y2="4.93"/></svg>
+                    </StatCard>
+                  )}
+                </motion.section>
+              )}
 
-                    {/* Technical Metadata Overlays */}
-                    <div className="absolute top-12 left-12 space-y-1 opacity-40">
-                      <span className="block text-[8px] font-mono text-parchment tracking-[0.3em]">
-                        RES: 8K_RAW
-                      </span>
-                      <span className="block text-[8px] font-mono text-parchment tracking-[0.3em]">
-                        OPTICS: ZEISS_75MM
-                      </span>
+              {/* Scientific Profile */}
+              {(specimen.description || profile.behaviour_notes || profile.venom_medical_relevance) && (
+                <motion.section {...fadeUp} className="space-y-16 md:space-y-20">
+                  <SectionHeading title="Scientific Profile" subtitle="The Encyclopedia Entry" />
+
+                  <div className="max-w-full space-y-20">
+                    {specimen.description && (
+                      <p className="text-3xl md:text-4xl font-serif text-ink/80 leading-relaxed italic first-letter:text-8xl first-letter:font-bold first-letter:mr-4 first-letter:float-left first-letter:text-moss text-justify">
+                        {specimen.description}
+                      </p>
+                    )}
+
+                    {(profile.behaviour_notes || profile.venom_medical_relevance) && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-20 pt-4">
+                        {profile.behaviour_notes && (
+                          <div className="space-y-8">
+                            <h4 className="text-[11px] font-bold uppercase tracking-[0.4em] text-moss border-b border-moss/10 pb-4">
+                              Behavioral Dynamics
+                            </h4>
+                            <p className="text-base md:text-lg text-ink/50 leading-relaxed font-medium">
+                              {profile.behaviour_notes}
+                            </p>
+                          </div>
+                        )}
+                        {profile.venom_medical_relevance && (
+                          <div className="space-y-8">
+                            <h4 className="text-[11px] font-bold uppercase tracking-[0.4em] text-moss border-b border-moss/10 pb-4">
+                              Medical Relevance
+                            </h4>
+                            <p className="text-base md:text-lg text-ink/50 leading-relaxed font-medium">
+                              {profile.venom_medical_relevance}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </motion.section>
+              )}
+
+              {/* Hobbyist Summary */}
+              {profile.hobbyist_summary && (
+                <motion.section {...fadeUp} className="space-y-10 md:space-y-15">
+                  <SectionHeading title="Hobbyist Summary" subtitle="For the Curious Naturalist" />
+                  <div className="max-w-full">
+                    <div className="relative p-12 md:p-16 bg-moss rounded-3xl border border-parchment/10 shadow-lg shadow-ink/10">
+                      <div className="absolute top-8 left-8 w-10 h-10 border-t border-l border-parchment/10 rounded-tl-xl opacity-30" />
+                      <div className="absolute top-8 right-8 w-10 h-10 border-t border-r border-parchment/10 rounded-tr-xl opacity-30" />
+                      <p className="text-xl md:text-2xl font-serif text-parchment/80 italic leading-relaxed">
+                        {profile.hobbyist_summary}
+                      </p>
                     </div>
+                  </div>
+                </motion.section>
+              )}
 
-                    <div className="absolute bottom-12 right-12 text-right space-y-1 opacity-40">
-                      <span className="block text-[8px] font-mono text-parchment tracking-[0.3em]">
-                        SPECIMEN_ID: {specimen.wsc_species_id}
-                      </span>
-                      <div className="flex items-center justify-end gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-moss animate-pulse" />
-                        <span className="text-[8px] font-mono text-parchment tracking-[0.3em]">
-                          FOCUS: LOCKED
+              {/* Biometrics */}
+              {(profile.size_min || profile.size_max || profile.similar_species || specimen.distribution || profile.diet) && (
+                <motion.section {...fadeUp} className="space-y-10 md:space-y-15">
+                  <SectionHeading title="Biometrics" subtitle="Physical Characteristics" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-20 bg-moss p-14 md:p-18 rounded-3xl border border-parchment/10 shadow-lg shadow-ink/10">
+                    <div className="space-y-10">
+                      {(profile.size_min || profile.size_max) && (
+                        <BiometricBlock label="Average Size Span">
+                          <div className="flex items-baseline gap-3">
+                            <span className="text-5xl md:text-6xl font-serif text-parchment leading-none">
+                              {profile.size_min || "—"} &ndash; {profile.size_max || "—"}
+                            </span>
+                            <span className="text-base italic text-parchment/40">mm</span>
+                          </div>
+                        </BiometricBlock>
+                      )}
+                      {profile.similar_species && (
+                        <BiometricBlock label="Similar Species">
+                          <p className="text-base md:text-lg font-medium text-parchment/60 leading-relaxed">
+                            {profile.similar_species}
+                          </p>
+                        </BiometricBlock>
+                      )}
+                    </div>
+                    <div className="space-y-10">
+                      {specimen.distribution && (
+                        <BiometricBlock label="Geographic Focus">
+                          <p className="text-xl md:text-2xl font-serif text-parchment italic leading-snug">
+                            {specimen.distribution}
+                          </p>
+                        </BiometricBlock>
+                      )}
+                      {profile.diet && (
+                        <BiometricBlock label="Dietary Profile">
+                          <p className="text-base md:text-lg font-medium text-parchment/60 leading-relaxed">
+                            {profile.diet}
+                          </p>
+                        </BiometricBlock>
+                      )}
+                    </div>
+                  </div>
+                </motion.section>
+              )}
+
+              {/* References */}
+              {profile.references_list && (
+                <motion.section {...fadeUp} className="space-y-16 md:space-y-20">
+                  <SectionHeading title="References" subtitle="Cited Literature" />
+                  <div className="max-w-4xl">
+                    <div className="p-12 md:p-14 bg-parchment border border-ink/5 rounded-3xl shadow-sm">
+                      <p className="text-sm text-ink/60 font-medium leading-loose whitespace-pre-line">
+                        {profile.references_list}
+                      </p>
+                    </div>
+                  </div>
+                </motion.section>
+              )}
+
+              {/* Registry & Archive */}
+              {(specimen.lsid || specimen.wsc_species_id || specimen.wsc_legacy_id) && (
+                <motion.section {...fadeUp} className="space-y-16 md:space-y-20">
+                  <SectionHeading title="Registry & Archive" subtitle="Catalog Identification" />
+
+                  <div className="group relative p-14 md:p-18 bg-moss rounded-3xl border border-parchment/10 shadow-xl shadow-ink/20 transition-[border-color,box-shadow] duration-500 ease-out hover:border-parchment/20 hover:shadow-[0_0_0_1px_rgba(244,234,215,0.06),0_32px_64px_-12px_rgba(0,0,0,0.3)]">
+                    <CornerAccents />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+                      {specimen.lsid && (
+                        <div className="space-y-10">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-bold uppercase tracking-[0.35em] text-parchment/35">
+                              Registry LSID
+                            </span>
+                            <span className="text-[8px] font-mono text-parchment/20 uppercase tracking-widest">WSC</span>
+                          </div>
+                          <div className="relative p-5 bg-ink/40 rounded-2xl border border-parchment/8 group/code">
+                            <div className="absolute -top-px left-4 right-4 h-px bg-gradient-to-r from-transparent via-moss/30 to-transparent" />
+                            <div className="flex items-start justify-between gap-4">
+                              <p className="font-mono text-[11px] text-parchment/65 break-all leading-relaxed select-all tracking-wide">
+                                {specimen.lsid}
+                              </p>
+                              <button
+                                onClick={() => navigator.clipboard.writeText(specimen.lsid)}
+                                className="shrink-0 mt-0.5 p-1.5 rounded-lg bg-parchment/5 border border-parchment/5 text-parchment/25 hover:text-parchment/60 hover:bg-parchment/10 hover:border-parchment/10 active:scale-[0.97] transition-[color,background-color,border-color,transform] duration-200 ease-out"
+                                aria-label="Copy LSID to clipboard"
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="space-y-10">
+                        <span className="text-[9px] font-bold uppercase tracking-[0.35em] text-parchment/35 block border-b border-parchment/8 pb-4">
+                          Archive Meta
                         </span>
+                        <div className="space-y-7">
+                          <MetaRow label="Archive ID" value={`#${specimen.wsc_species_id}`} />
+                          {specimen.wsc_legacy_id && (
+                            <MetaRow label="Legacy Ref" value={specimen.wsc_legacy_id} />
+                          )}
+                          <MetaRow
+                            label="Catalog Date"
+                            value={new Date(specimen.created_at).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "short",
+                            })}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
+                </motion.section>
+              )}
 
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-ink/20 opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-center justify-center">
-                    <div className="px-8 py-4 bg-parchment/10 backdrop-blur-md rounded-2xl border border-white/10 text-parchment text-[10px] font-bold uppercase tracking-[0.4em]">
-                      Enter Macro View
-                    </div>
+              {/* Documentation */}
+              {(specimen.vitamotus_notes || specimen.sources) && (
+                <motion.section {...fadeUp} className="space-y-16 md:space-y-20">
+                  <SectionHeading title="Documentation" subtitle="Sources & Archival Records" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                    {specimen.vitamotus_notes && (
+                      <DocCard
+                        label="Librarian Notes"
+                        bg="bg-parchment"
+                        textColor="text-ink/60"
+                        labelColor="text-ink/25"
+                        borderColor="border-ink/5"
+                        hoverBorderColor="hover:border-moss/20"
+                      >
+                        <p className="text-lg md:text-xl text-ink/60 font-serif italic leading-relaxed">
+                          {specimen.vitamotus_notes}
+                        </p>
+                      </DocCard>
+                    )}
+                    {specimen.sources && (
+                      <DocCard
+                        label="Research Sources"
+                        bg="bg-moss"
+                        textColor="text-parchment/65"
+                        labelColor="text-parchment/45"
+                        borderColor="border-parchment/10"
+                        hoverBorderColor="hover:border-parchment/20"
+                      >
+                        <p className="text-sm text-parchment/65 font-medium leading-relaxed whitespace-pre-line">
+                          {specimen.sources}
+                        </p>
+                      </DocCard>
+                    )}
                   </div>
-                </div>
+                </motion.section>
+              )}
 
-                {/* Shadow Accent */}
-                <div className="absolute -inset-4 bg-moss/5 blur-[100px] -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-              </div>
-
-              {/* Photo Gallery (if available) */}
-              {profile?.photo_gallery_urls &&
-                profile.photo_gallery_urls.length > 0 && (
-                  <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
-                    {/* Include the main image in the gallery if it's not already there */}
-                    {profile.photo_gallery_urls.map((path, i) => {
-                      const url = path.startsWith('http') ? path : `${process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:8000/storage'}/${path}`;
-                      return (
-                        <div
-                          key={i}
-                          onClick={() => setActiveImage(url)}
-                          className={`aspect-square rounded-2xl overflow-hidden bg-ink border transition-all duration-500 cursor-pointer ${activeImage === url ? 'border-moss scale-95 shadow-inner' : 'border-white/5 hover:border-moss/40'}`}
-                        >
-                          <img
-                            src={url}
-                            className={`w-full h-full object-cover transition-opacity duration-500 ${activeImage === url ? 'opacity-100' : 'opacity-40 hover:opacity-100'}`}
-                            alt=""
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-            </section>
-
-            {/* Encyclopedia Entry */}
-            <section className="space-y-12">
-              <ChapterHeading
-                title="Scientific Profile"
-                subtitle="The Encyclopedia Entry"
-              />
-
-              <div className="space-y-16">
-                {/* Primary Description */}
-                <div className="prose prose-ink max-w-none">
-                  <p className="text-2xl font-serif text-ink/80 leading-relaxed italic first-letter:text-7xl first-letter:font-bold first-letter:mr-3 first-letter:float-left first-letter:text-moss">
-                    {specimen.description ||
-                      "Detailed taxonomic descriptions for this species are currently under archive review. Preliminary data suggests a unique morphology consistent with regional variations."}
-                  </p>
-                </div>
-
-                {/* Behavioral & Medical */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-8">
-                  <div className="space-y-6">
-                    <h4 className="text-[11px] font-bold uppercase tracking-[0.4em] text-moss border-b border-moss/10 pb-3">
-                      Behavioral Dynamics
-                    </h4>
-                    <p className="text-sm text-ink/50 leading-relaxed font-medium">
-                      {profile.behaviour_notes ||
-                        "Specific behavioral observations for this specimen in wild environments are currently being compiled."}
-                    </p>
-                  </div>
-                  <div className="space-y-6">
-                    <h4 className="text-[11px] font-bold uppercase tracking-[0.4em] text-moss border-b border-moss/10 pb-3">
-                      Medical Relevance
-                    </h4>
-                    <p className="text-sm text-ink/50 leading-relaxed font-medium">
-                      {profile.venom_medical_relevance ||
-                        "No significant medical incidents involving this species have been documented in current toxicology databases."}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Physical Biometrics */}
-            <section className="space-y-12">
-              <ChapterHeading
-                title="Biometrics"
-                subtitle="Physical Characteristics"
-              />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 bg-white p-12 rounded-[3rem] border border-ink/5 shadow-sm">
-                <div className="space-y-8">
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-ink/20">
-                      Average Size Span
-                    </span>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-4xl font-serif">
-                        {profile.size_min || "12"} - {profile.size_max || "18"}
-                      </span>
-                      <span className="text-sm italic text-ink/40">mm</span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-ink/20">
-                      Similar Species
-                    </span>
-                    <p className="text-sm font-medium text-ink/60 leading-relaxed">
-                      {profile.similar_species ||
-                        "Distinct morphological features separate this species from closely related regional taxa."}
-                    </p>
-                  </div>
-                </div>
-                <div className="space-y-8">
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-ink/20">
-                      Geographic Focus
-                    </span>
-                    <p className="text-lg font-serif text-ink italic leading-snug">
-                      {specimen.distribution ||
-                        "Global Distribution data is currently being updated."}
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-ink/20">
-                      Dietary Profile
-                    </span>
-                    <p className="text-sm font-medium text-ink/60 leading-relaxed">
-                      {profile.diet ||
-                        "Generalist insectivore, primarily preying on smaller flying arthropods."}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Archive Notes & Sources */}
-            <section className="space-y-12">
-              <ChapterHeading
-                title="Documentation"
-                subtitle="Sources & Archival Records"
-              />
-              <div className="grid grid-cols-1 gap-8">
-                <div className="p-10 bg-parchment/50 border border-ink/5 rounded-[2.5rem] space-y-4">
-                  <h5 className="text-[10px] font-bold uppercase tracking-[0.3em] text-ink/30">
-                    Librarian Notes
-                  </h5>
-                  <p className="text-lg text-ink/60 font-serif italic leading-relaxed">
-                    {specimen.vitamotus_notes ||
-                      "Field notes for this entry are awaiting final transcription from the original journal records."}
-                  </p>
-                </div>
-                <div className="p-10 bg-moss/5 border border-moss/10 rounded-[2.5rem] space-y-4">
-                  <h5 className="text-[10px] font-bold uppercase tracking-[0.3em] text-moss/60">
-                    Research Sources
-                  </h5>
-                  <p className="text-xs text-moss/70 font-medium leading-relaxed whitespace-pre-line leading-loose">
-                    {specimen.sources ||
-                      "Primary taxonomy validated through the World Spider Catalog. Ecological data synthesized from regional arachnological surveys and IUCN databases."}
-                  </p>
-                </div>
-              </div>
-            </section>
-          </div>
-
-          {/* RIGHT COLUMN: Sidebar Meta */}
-          <div className="lg:col-span-4 space-y-12">
-            {/* Metadata Card */}
-            <div className="sticky top-32 p-12 bg-white border border-ink/5 rounded-[3rem] space-y-12 shadow-xl shadow-ink/5">
-              <div className="space-y-10">
-                <div className="space-y-4">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-ink/30 block border-b border-ink/5 pb-4">
-                    Registry LSID
-                  </span>
-                  <p className="font-mono text-[10px] text-ink/40 break-all leading-relaxed">
-                    {specimen.lsid || "URN:LSID:NMBE.CH:SPIDER:12345"}
-                  </p>
-                </div>
-
-                <div className="space-y-6">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-ink/30 block border-b border-ink/5 pb-4">
-                    Archive Meta
-                  </span>
-                  <div className="space-y-6">
-                    <div className="flex justify-between items-end">
-                      <span className="text-[10px] text-ink/30 uppercase tracking-widest">
-                        Archive ID
-                      </span>
-                      <span className="font-serif italic text-lg text-moss">
-                        #{specimen.wsc_species_id}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-end">
-                      <span className="text-[10px] text-ink/30 uppercase tracking-widest">
-                        Legacy Ref
-                      </span>
-                      <span className="font-serif italic text-lg text-ink">
-                        {specimen.wsc_legacy_id || "N/A"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-end">
-                      <span className="text-[10px] text-ink/30 uppercase tracking-widest">
-                        Catalog Date
-                      </span>
-                      <span className="font-serif italic text-lg text-ink">
-                        {new Date(specimen.created_at).toLocaleDateString(
-                          "en-US",
-                          { year: "numeric", month: "short" },
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+          {/* Public Notice */}
+          <motion.div {...fadeUp} className="group relative p-12 md:p-16 bg-ink rounded-3xl border border-parchment/5 shadow-inner shadow-black/20 transition-[border-color] duration-500 ease-out hover:border-parchment/10">
+            <div className="absolute top-8 left-8 w-8 h-8 border-t border-l border-parchment/5 rounded-tl-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute top-8 right-8 w-8 h-8 border-t border-r border-parchment/5 rounded-tr-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="flex items-center gap-4 mb-8">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-moss/60" />
+                <span className="absolute inline-flex h-full w-full rounded-full bg-moss animate-ping motion-reduce:animate-none" />
+              </span>
+              <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-parchment">
+                Public Notice
+              </h4>
             </div>
-
-            {/* Public Notice */}
-            <div className="p-10 bg-ink rounded-[2.5rem] border border-white/5 space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-moss" />
-                <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-parchment">
-                  Public Notice
-                </h4>
-              </div>
-              <p className="text-xs text-parchment/40 leading-relaxed italic font-serif">
-                Observation data for {specimen.scientific_name} is curated for
-                educational purposes. Always exercise caution and respect when
-                encountering wildlife in their natural habitats.
-              </p>
-            </div>
-          </div>
-        </div>
+            <p className="text-base md:text-lg text-parchment/35 leading-relaxed italic font-serif max-w-3xl">
+              Observation data for {specimen.scientific_name} is curated for
+              educational purposes. Always exercise caution and respect when
+              encountering wildlife in their natural habitats.
+            </p>
+          </motion.div>
         </div>
       </div>
     </MainLayout>
   );
 }
 
-function StatCard({ label, value, icon }) {
+function StatCard({ label, value, children }) {
   return (
-    <div className="p-10 bg-white border border-ink/5 rounded-[2.5rem] space-y-4 shadow-sm hover:translate-y-[-4px] transition-transform duration-500">
+    <div className="p-12 md:p-14 bg-moss border border-parchment/10 rounded-3xl space-y-5 shadow-sm transition-[transform,box-shadow] duration-300 ease-out hover:shadow-[0_0_0_1px_rgba(244,234,215,0.15),0_4px_12px_-2px_rgba(0,0,0,0.3)] hover:-translate-y-0.5">
       <div className="flex items-center justify-between">
-        <span className="text-[9px] uppercase tracking-widest text-ink/30 font-bold">
+        <span className="text-[10px] uppercase tracking-widest text-parchment/50 font-bold">
           {label}
         </span>
-        <span className="text-xl">{icon}</span>
+        <span className="text-parchment/25">{children}</span>
       </div>
-      <p className="text-xl font-serif text-ink italic leading-tight">
+      <p className="text-2xl md:text-3xl font-serif text-parchment italic leading-tight">
         {value}
       </p>
     </div>
   );
 }
 
-function ChapterHeading({ title, subtitle }) {
+function SectionHeading({ title, subtitle }) {
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-4">
-        <div className="h-[1px] w-8 bg-moss/40" />
+    <div className="space-y-4">
+      <div className="flex items-center gap-5">
+        <div className="h-px w-10 bg-moss/40" />
         <p className="text-[10px] uppercase tracking-[0.4em] text-moss font-bold">
           {subtitle}
         </p>
       </div>
-      <h2 className="text-4xl md:text-5xl font-serif text-ink italic tracking-tight">
+      <h2 className="text-5xl md:text-7xl font-serif text-ink italic tracking-tight leading-none">
         {title}
       </h2>
+    </div>
+  );
+}
+
+function BiometricBlock({ label, children }) {
+  return (
+    <div className="space-y-3">
+      <span className="text-[10px] font-bold uppercase tracking-widest text-parchment/40">
+        {label}
+      </span>
+      {children}
+    </div>
+  );
+}
+
+function DocCard({ label, children, bg, textColor, labelColor, borderColor, hoverBorderColor }) {
+  return (
+    <div className={`group relative p-12 md:p-14 ${bg} ${borderColor} rounded-3xl space-y-5 shadow-sm transition-[border-color,box-shadow] duration-500 ease-out ${hoverBorderColor} ${hoverBorderColor.includes('moss') ? 'hover:shadow-[0_0_0_1px_rgba(73,107,74,0.08),0_8px_24px_-4px_rgba(0,0,0,0.04)]' : 'hover:shadow-[0_0_0_1px_rgba(244,234,215,0.08),0_8px_24px_-4px_rgba(0,0,0,0.15)]'}`}>
+      <div className={`absolute top-5 left-5 w-5 h-5 border-t border-l rounded-tl-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${borderColor.replace('border-', 'border-').replace('/10', '/20')}`} />
+      <div className={`absolute top-5 right-5 w-5 h-5 border-t border-r rounded-tr-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${borderColor.replace('border-', 'border-').replace('/10', '/20')}`} />
+      <h5 className={`text-[10px] font-bold uppercase tracking-[0.3em] ${labelColor}`}>
+        {label}
+      </h5>
+      {children}
+    </div>
+  );
+}
+
+function CornerAccents() {
+  return (
+    <>
+      <div className="absolute top-6 left-6 w-8 h-8 border-t border-l border-parchment/10 rounded-tl-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute top-6 right-6 w-8 h-8 border-t border-r border-parchment/10 rounded-tr-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute bottom-6 left-6 w-8 h-8 border-b border-l border-parchment/10 rounded-bl-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute bottom-6 right-6 w-8 h-8 border-b border-r border-parchment/10 rounded-br-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    </>
+  );
+}
+
+function MetaRow({ label, value }) {
+  return (
+    <div className="flex justify-between items-end group/row cursor-default">
+      <span className="text-[9px] text-parchment/30 uppercase tracking-[0.3em] transition-colors duration-300 group-hover/row:text-parchment/50">
+        {label}
+      </span>
+      <span className="font-serif italic text-xl text-parchment transition-colors duration-300 group-hover/row:text-parchment/80">
+        {value}
+      </span>
     </div>
   );
 }

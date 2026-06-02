@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import Link from "next/link";
+import Image from "next/image";
 import Lottie from "lottie-react";
 
 // Assets
@@ -83,44 +84,98 @@ export default function HomeView() {
 
   useGSAP(
     () => {
-      // ─── CHAPTER REVEALS ───
-      const sections = gsap.utils.toArray("section[data-chapter]");
+      const mm = gsap.matchMedia();
 
-      sections.forEach((section) => {
-        const header = section.querySelector(".chapter-header");
-        const content = section.querySelectorAll(".reveal-content");
+      // ─── REDUCED MOTION: instant reveal ───
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        const sections = gsap.utils.toArray("section[data-chapter]");
+        sections.forEach((section) => {
+          const header = section.querySelector(".chapter-header");
+          const content = section.querySelectorAll(".reveal-content");
+          if (header) gsap.set(header.children, { opacity: 1, y: 0, filter: "blur(0px)" });
+          content.forEach((el) => gsap.set(el, { opacity: 1, y: 0, filter: "blur(0px)" }));
 
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: section,
-            start: "top 80%",
-            toggleActions: "play none none reverse",
-          },
+          // Chapter 5: show SVG nodes
+          const nodes = section.querySelectorAll(".convergence-node, .convergence-arc, .convergence-cross, .convergence-core");
+          if (nodes.length) gsap.set(nodes, { opacity: 1, scale: 1 });
         });
+      });
 
-        if (header) {
-          tl.from(header.children, {
-            y: 30,
-            opacity: 0,
-            stagger: 0.1,
-            duration: 1,
-            ease: "expo.out",
-          });
-        }
+      // ─── FULL MOTION: chapter reveals ───
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const sections = gsap.utils.toArray("section[data-chapter]");
 
-        if (content.length > 0) {
-          tl.from(
-            content,
-            {
-              y: 40,
-              opacity: 0,
-              stagger: 0.15,
-              duration: 1.2,
-              ease: "expo.out",
+        sections.forEach((section) => {
+          const header = section.querySelector(".chapter-header");
+          const content = section.querySelectorAll(".reveal-content");
+          const chapter = section.dataset.chapter;
+
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: section,
+              start: "top 80%",
+              toggleActions: "play none none reverse",
             },
-            "-=0.6",
-          );
-        }
+          });
+
+          if (header) {
+            tl.from(header.children, {
+              y: 24,
+              opacity: 0,
+              filter: "blur(6px)",
+              stagger: 0.08,
+              duration: 0.6,
+              ease: "power3.out",
+            });
+          }
+
+          if (content.length > 0) {
+            tl.from(
+              content,
+              {
+                y: 32,
+                opacity: 0,
+                filter: "blur(4px)",
+                stagger: 0.12,
+                duration: 0.7,
+                ease: "power3.out",
+              },
+              "-=0.3",
+            );
+          }
+
+          // ─── PER-CHAPTER ENHANCEMENTS ───
+          if (chapter === "4") {
+            const bgText = section.querySelector(".gallery-watermark");
+            if (bgText) {
+              tl.from(bgText, { opacity: 0, x: -60, duration: 0.8, ease: "power2.out" }, "-=0.5");
+            }
+          }
+
+          if (chapter === "5") {
+            const metrics = section.querySelectorAll(".chapter-metrics > div");
+            if (metrics.length) {
+              tl.from(metrics, { y: 20, opacity: 0, stagger: 0.08, duration: 0.5, ease: "power2.out" }, "-=0.2");
+            }
+
+            const nodes = section.querySelectorAll(".convergence-node");
+            if (nodes.length) {
+              tl.from(nodes, { scale: 0, opacity: 0, stagger: 0.015, duration: 0.4, ease: "back.out(1.5)" }, "-=0.4");
+            }
+
+            const arcs = section.querySelectorAll(".convergence-arc, .convergence-cross");
+            if (arcs.length) {
+              tl.from(arcs, { opacity: 0, stagger: 0.02, duration: 0.3, ease: "power2.out" }, "-=0.3");
+            }
+          }
+
+          if (chapter === "6") {
+            const bgGlows = section.querySelectorAll(".cta-glow");
+            if (bgGlows.length) {
+              tl.from(bgGlows, { scale: 0.8, opacity: 0, duration: 0.8, ease: "power2.out" }, "-=0.4");
+            }
+          }
+        });
       });
     },
     { scope: containerRef },
@@ -138,7 +193,7 @@ export default function HomeView() {
       />
 
       <main className="relative z-10 w-full flex flex-col items-center">
-        <section className="w-full">
+        <section className="relative w-full">
           <Hero />
         </section>
 
@@ -151,20 +206,20 @@ export default function HomeView() {
           <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
             {/* Organic Web Background Image */}
             <div className="absolute inset-0 z-0">
-              <img 
-                src="/assets/web/web-01.png.png" 
-                alt="Web Pattern" 
+              <img
+                src="/assets/web/web-01.png.png"
+                alt="Web Pattern"
                 className="w-full h-full object-cover opacity-[0.08] mix-blend-multiply md:scale-110"
               />
             </div>
 
             {/* Subtle Dot Grid */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:32px_32px]" />
-            
+
             {/* Organic Biological Patterns (Corner Sketched Web/Cells) */}
             <div className="absolute -top-24 -left-24 w-96 h-96 border border-ink/[0.03] rounded-full [mask-image:linear-gradient(to_bottom_right,black,transparent)]" />
             <div className="absolute -bottom-48 -right-48 w-[40rem] h-[40rem] border border-ink/[0.02] rounded-full [mask-image:linear-gradient(to_top_left,black,transparent)]" />
-            
+
             {/* Scientific Watermarks */}
             <div className="absolute top-20 right-20 flex flex-col items-end opacity-20">
               <span className="text-[8px] font-mono tracking-[0.4em] uppercase">Ref_Log // 300.21</span>
@@ -242,7 +297,7 @@ export default function HomeView() {
           <div className="absolute inset-0 z-0 overflow-hidden">
             {/* Deep Space / Neural Web Background */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,#0a0f24_0%,#050816_100%)]" />
-            
+
             {/* Interactive Grid System */}
             <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(244,241,234,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(244,241,234,0.05)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_at_center,black,transparent:80%)]" />
 
@@ -262,16 +317,16 @@ export default function HomeView() {
 
             {/* Aurora / Neural Glare (Cream/Parchment style) */}
             <motion.div
-              animate={{ 
+              animate={{
                 opacity: [0.05, 0.1, 0.05],
                 scale: [1, 1.1, 1],
               }}
               transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
               className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-parchment/10 blur-[160px] pointer-events-none"
             />
-            
+
             <motion.div
-              animate={{ 
+              animate={{
                 opacity: [0.03, 0.08, 0.03],
                 scale: [1.2, 1, 1.2],
               }}
@@ -282,10 +337,10 @@ export default function HomeView() {
 
           {/* ─── HUD OVERLAY CONTENT ─── */}
           <div className="relative z-10 w-full h-full max-w-[1800px] mx-auto px-10 md:px-20 flex flex-col justify-between py-24 pointer-events-none">
-            
+
             {/* TOP BAR: Research Metadata */}
             <div className="flex justify-between items-start w-full">
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 className="space-y-1"
@@ -332,7 +387,7 @@ export default function HomeView() {
                   transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
                   className="absolute inset-8 md:inset-16 border border-parchment/5 rounded-full border-dashed"
                 />
-                
+
                 {/* Orbital Metrics */}
                 {[
                   { label: "Hydraulics", val: "842 PSI", pos: "top-0 left-1/2 -translate-x-1/2 -translate-y-1/2" },
@@ -356,7 +411,7 @@ export default function HomeView() {
 
             {/* BOTTOM SECTION: Navigation & Summary */}
             <div className="w-full flex flex-col lg:flex-row items-end lg:items-center justify-between gap-12 pointer-events-auto">
-              
+
               {/* Feature Cards: High-end research style */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full lg:max-w-4xl">
                 {[
@@ -372,7 +427,7 @@ export default function HomeView() {
                     className="group relative overflow-hidden bg-white/[0.02] border border-white/10 backdrop-blur-xl p-6 rounded-2xl hover:border-parchment/30 transition-all duration-500"
                   >
                     <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-parchment/20 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
-                    
+
                     <div className="flex items-center gap-4 mb-3">
                       <div className="p-2 rounded-lg bg-parchment/5 group-hover:bg-parchment/10 transition-colors">
                         <svg className="w-4 h-4 text-parchment/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -399,7 +454,7 @@ export default function HomeView() {
                 >
                   <span className="relative z-10">Access Motion Archive</span>
                   <div className="relative z-10 w-10 h-[1px] bg-[#050816]/30 group-hover:w-14 group-hover:bg-[#050816] transition-all duration-500" />
-                  
+
                   {/* Hover Glare Effect */}
                   <motion.div
                     className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"
@@ -418,46 +473,20 @@ export default function HomeView() {
           className="w-full py-20 md:py-40 border-b border-ink/5"
         >
           <div className="max-w-7xl mx-auto px-8 md:px-16 flex flex-col items-center">
-            <div className="text-center mb-24">
-              <ChapterHeading
-                title="Spotlight."
-                subtitle="The specimen of the day."
-              />
+            <div className="flex items-center gap-3 mb-2 self-start">
+              <span className="w-8 h-[1px] bg-ink/10" />
+              <span className="text-[9px] font-bold uppercase tracking-[0.6em] text-ink/20">Featured Specimen</span>
             </div>
-            <div className="w-full max-w-6xl min-h-[400px] reveal-content">
+            <div className="w-full max-w-6xl min-h-[400px] reveal-content pt-4">
               <SpeciesOfTheDay isHorizontal={true} />
             </div>
           </div>
         </section>
 
         {/* ═══ CHAPTER IV ═══ */}
-        <section data-chapter="4" className="w-full py-20 md:py-40 bg-ink/5">
-          <div className="max-w-7xl mx-auto px-8 md:px-16 mb-20">
-            <ChapterHeading
-              title="Gallery."
-              subtitle="A high-fidelity visual database."
-            />
-          </div>
+        <section data-chapter="4" className="w-full bg-ink/5">
           <div className="reveal-content">
             <SpecimenGallery />
-          </div>
-        </section>
-
-        {/* ═══ CHAPTER V ═══ */}
-        <section data-chapter="5" className="w-full py-24 md:py-60">
-          <div className="max-w-7xl mx-auto px-8 md:px-16">
-            <div className="text-center mb-32 flex flex-col items-center">
-              <ChapterHeading
-                title="Synthesis."
-                subtitle="The intersection of life and motion."
-              />
-            </div>
-            <div className="reveal-content">
-              <FeatureGrid isFourColumn={true} />
-            </div>
-            <div className="mt-60 reveal-content">
-              <SearchSection />
-            </div>
           </div>
         </section>
 
@@ -465,7 +494,6 @@ export default function HomeView() {
           <CTA />
         </section>
 
-        <ValueBar />
       </main>
     </div>
   );
