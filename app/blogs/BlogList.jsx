@@ -43,11 +43,11 @@ export default function BlogList({ posts }) {
 
             <div className="flex-1 pl-5 md:pl-10">
               <div className="grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-12">
-                {post.featured_image_url && (
+                {post.featured_image && (
                   <div className="md:col-span-5 lg:col-span-4 overflow-hidden rounded-xl bg-ink/[0.03] ring-1 ring-ink/5 group-hover:ring-moss/20 transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] md:h-full">
                     <div className="aspect-[16/9] md:h-full">
                       <img
-                        src={post.featured_image_url}
+                        src={post.featured_image}
                         alt={post.title}
                         className="w-full h-full object-cover transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
                       />
@@ -57,7 +57,7 @@ export default function BlogList({ posts }) {
 
                 <div
                   className={
-                    post.featured_image_url
+                    post.featured_image
                       ? "md:col-span-7 lg:col-span-8 flex flex-col justify-center"
                       : "md:col-span-10 md:col-start-3"
                   }
