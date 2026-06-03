@@ -70,14 +70,25 @@ export default function BlogsPage() {
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="bg-white border border-ink/5 rounded-[2rem] overflow-hidden animate-pulse">
-                  <div className="aspect-[16/10] bg-ink/5" />
-                  <div className="p-8 space-y-4">
-                    <div className="h-3 w-24 bg-ink/5 rounded" />
-                    <div className="h-6 w-full bg-ink/5 rounded" />
-                    <div className="h-4 w-3/4 bg-ink/5 rounded" />
+            <div className="animate-pulse space-y-0 divide-y divide-ink/5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex gap-0 py-8 md:py-14">
+                  <div className="w-0.5 shrink-0 bg-ink/5" />
+                  <div className="flex-1 pl-5 md:pl-10 grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-12">
+                    <div className="md:col-span-5 lg:col-span-4">
+                      <div className="aspect-[16/9] md:aspect-[4/3] rounded-xl bg-ink/5" />
+                    </div>
+                    <div className="md:col-span-7 lg:col-span-8">
+                      <div className="flex gap-3 mb-3">
+                        <div className="h-2 w-20 bg-ink/5 rounded" />
+                        <div className="h-2 w-16 bg-ink/5 rounded" />
+                      </div>
+                      <div className="h-8 md:h-10 w-3/4 bg-ink/5 rounded" />
+                      <div className="mt-4 space-y-2">
+                        <div className="h-4 w-full bg-ink/5 rounded" />
+                        <div className="h-4 w-1/2 bg-ink/5 rounded" />
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}

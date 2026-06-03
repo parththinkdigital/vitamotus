@@ -161,7 +161,7 @@ export default function FamilyDetailPage() {
                 </div>
 
                 <Link 
-                  href="/archive"
+                  href="/families"
                   className="relative z-10 flex items-center justify-between p-5 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all text-[10px] font-bold uppercase tracking-[0.3em]"
                 >
                   Return to Archive

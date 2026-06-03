@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { adminBlogApi } from "@/lib/api";
@@ -12,7 +12,10 @@ const SummernoteEditor = dynamic(() => import("@/components/ui/SummernoteEditor"
 
 export default function NewBlogPost() {
   const router = useRouter();
+  const fileRef = useRef(null);
   const [saving, setSaving] = useState(false);
+  const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState(null);
   const [form, setForm] = useState({
     title: "",
     slug: "",
@@ -24,11 +27,29 @@ export default function NewBlogPost() {
 
   const update = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
 
+  const handleFile = (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setFile(f);
+    setPreview(URL.createObjectURL(f));
+  };
+
+  const removeFile = () => {
+    setFile(null);
+    setPreview(null);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
-      await adminBlogApi.createPost(form);
+      const post = await adminBlogApi.createPost(form);
+      if (file) {
+        const fd = new FormData();
+        fd.append("image", file);
+        await adminBlogApi.uploadImage(post.id, fd);
+      }
       toast.success("Post created successfully.");
       router.push("/admin/blogs");
     } catch (err) {
@@ -77,6 +98,31 @@ export default function NewBlogPost() {
               className="w-full bg-parchment border border-ink/10 rounded-xl px-6 py-4 text-ink focus:outline-none focus:border-moss/40 resize-none"
               placeholder="A short summary of the post..."
             />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-ink/40">Featured Image</label>
+            <div className="flex items-start gap-6">
+              <div className="flex-1">
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFile}
+                  className="w-full bg-parchment border border-ink/10 rounded-xl px-6 py-4 text-ink text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:uppercase file:tracking-widest file:bg-ink file:text-parchment file:cursor-pointer hover:file:bg-moss focus:outline-none focus:border-moss/40"
+                />
+                {preview && (
+                  <button type="button" onClick={removeFile} className="mt-2 text-[9px] font-bold uppercase tracking-widest text-red-400 hover:text-red-500">
+                    Remove image
+                  </button>
+                )}
+              </div>
+              {preview && (
+                <div className="w-28 h-20 rounded-xl overflow-hidden bg-ink/5 shrink-0 border border-ink/5">
+                  <img src={preview} alt="preview" className="w-full h-full object-cover" />
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="space-y-2">

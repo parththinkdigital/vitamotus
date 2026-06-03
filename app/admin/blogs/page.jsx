@@ -81,6 +81,7 @@ export default function AdminBlogList() {
           <table className="w-full text-left">
             <thead className="bg-ink/5">
               <tr>
+                <th className="px-8 py-6 text-[10px] font-bold uppercase tracking-widest text-ink/40">Image</th>
                 <th className="px-8 py-6 text-[10px] font-bold uppercase tracking-widest text-ink/40">Title</th>
                 <th className="px-8 py-6 text-[10px] font-bold uppercase tracking-widest text-ink/40">Author</th>
                 <th className="px-8 py-6 text-[10px] font-bold uppercase tracking-widest text-ink/40">Status</th>
@@ -91,6 +92,17 @@ export default function AdminBlogList() {
             <tbody className="divide-y divide-ink/5">
               {posts.map((post) => (
                 <tr key={post.id} className="hover:bg-ink/[0.02] transition-colors">
+                  <td className="px-8 py-6">
+                    {post.featured_image_url ? (
+                      <div className="w-14 h-10 rounded-lg overflow-hidden bg-ink/5 border border-ink/5">
+                        <img src={post.featured_image_url} alt="" className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="w-14 h-10 rounded-lg bg-ink/5 border border-ink/5 flex items-center justify-center">
+                        <span className="text-[8px] font-bold uppercase tracking-widest text-ink/20">None</span>
+                      </div>
+                    )}
+                  </td>
                   <td className="px-8 py-6">
                     <p className="font-serif text-lg text-ink">{post.title}</p>
                     <p className="text-[10px] text-ink/30 uppercase tracking-widest font-mono">

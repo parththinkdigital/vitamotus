@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { adminBlogApi } from "@/lib/api";
@@ -13,8 +13,13 @@ const SummernoteEditor = dynamic(() => import("@/components/ui/SummernoteEditor"
 export default function EditBlogPost() {
   const { id } = useParams();
   const router = useRouter();
+  const fileRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [file, setFile] = useState(null);
+  const [newPreview, setNewPreview] = useState(null);
+  const [removeImage, setRemoveImage] = useState(false);
+  const [existingImage, setExistingImage] = useState(null);
   const [form, setForm] = useState({
     title: "",
     slug: "",
@@ -39,6 +44,7 @@ export default function EditBlogPost() {
           author: post.author || "",
           status: post.status || "draft",
         });
+        setExistingImage(post.featured_image_url || post.featured_image || null);
       })
       .catch((err) => {
         toast.error("Failed to load post: " + (err.message || "Unknown error"));
@@ -47,11 +53,33 @@ export default function EditBlogPost() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  const handleFile = (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setFile(f);
+    setNewPreview(URL.createObjectURL(f));
+    setRemoveImage(false);
+  };
+
+  const handleRemoveImage = () => {
+    setFile(null);
+    setNewPreview(null);
+    setRemoveImage(true);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
-      await adminBlogApi.updatePost(id, form);
+      const data = { ...form };
+      if (removeImage) data.featured_image = null;
+      await adminBlogApi.updatePost(id, data);
+      if (file) {
+        const fd = new FormData();
+        fd.append("image", file);
+        await adminBlogApi.uploadImage(id, fd);
+      }
       toast.success("Post updated successfully.");
       router.push("/admin/blogs");
     } catch (err) {
@@ -108,6 +136,41 @@ export default function EditBlogPost() {
               onChange={(e) => update("excerpt", e.target.value)}
               className="w-full bg-parchment border border-ink/10 rounded-xl px-6 py-4 text-ink focus:outline-none focus:border-moss/40 resize-none"
             />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-ink/40">Featured Image</label>
+            <div className="flex items-start gap-6">
+              <div className="flex-1 space-y-2">
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFile}
+                  className="w-full bg-parchment border border-ink/10 rounded-xl px-6 py-4 text-ink text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:uppercase file:tracking-widest file:bg-ink file:text-parchment file:cursor-pointer hover:file:bg-moss focus:outline-none focus:border-moss/40"
+                />
+                {(existingImage || newPreview) && (
+                  <button type="button" onClick={handleRemoveImage} className="text-[9px] font-bold uppercase tracking-widest text-red-400 hover:text-red-500">
+                    Remove image
+                  </button>
+                )}
+              </div>
+              {(existingImage && !newPreview && !removeImage) && (
+                <div className="w-28 h-20 rounded-xl overflow-hidden bg-ink/5 shrink-0 border border-ink/5">
+                  <img src={existingImage} alt="current" className="w-full h-full object-cover" />
+                </div>
+              )}
+              {newPreview && (
+                <div className="w-28 h-20 rounded-xl overflow-hidden bg-ink/5 shrink-0 border border-ink/5">
+                  <img src={newPreview} alt="preview" className="w-full h-full object-cover" />
+                </div>
+              )}
+              {(removeImage && existingImage && !newPreview) && (
+                <div className="w-28 h-20 rounded-xl overflow-hidden bg-ink/5 shrink-0 border border-red-200 flex items-center justify-center text-[8px] font-bold uppercase tracking-widest text-red-400">
+                  Will be removed
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="space-y-2">
