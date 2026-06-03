@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { getBlogImageUrl } from "@/lib/api";
 
 function readingTime(html) {
   const text = html.replace(/<[^>]*>/g, "");
@@ -59,7 +60,7 @@ export default function BlogDetails({ post }) {
       {post.featured_image && (
         <div className="rounded-[2rem] overflow-hidden mb-14">
           <img
-            src={post.featured_image}
+            src={getBlogImageUrl(post.featured_image)}
             alt={post.title}
             className="w-full h-auto object-cover"
           />

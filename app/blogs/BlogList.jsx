@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { getBlogImageUrl } from "@/lib/api";
 
 const ease = [0.22, 1, 0.36, 1];
 
@@ -47,7 +48,7 @@ export default function BlogList({ posts }) {
                   <div className="md:col-span-5 lg:col-span-4 overflow-hidden rounded-xl bg-ink/[0.03] ring-1 ring-ink/5 group-hover:ring-moss/20 transition-all duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] md:h-full">
                     <div className="aspect-[16/9] md:h-full">
                       <img
-                        src={post.featured_image}
+                        src={getBlogImageUrl(post.featured_image)}
                         alt={post.title}
                         className="w-full h-full object-cover transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
                       />
